@@ -1,0 +1,64 @@
+.player-card {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 15px;
+  padding: 15px;
+  margin: 0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: #333;
+  width: 100%; /* Ocupar todo el ancho disponible */
+  max-width: 400px; /* Limitar el ancho máximo del botón */
+  margin: 10px auto; /* Centrar el botón y añadir espacio vertical */
+  display: flex;
+  justify-content: space-between; /* Alinear nombre a la izquierda y dinero a la derecha */
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+}
+
+.player-card:hover {
+  transform: translateY(-3px);
+}
+
+.player-card.selected {
+  border: 2px solid #007bff; /* Borde azul para indicar selección */
+  box-shadow: 0 0 15px rgba(0, 123, 255, 0.5); /* Sombra azul para resaltar */
+}
+
+.player-name {
+  font-weight: bold;
+  color: #696969;
+}
+
+.player-money {
+  font-weight: bold;
+  color: #4CAF50; /* Color para el dinero */
+}
+
+.money-animation {
+  position: absolute;
+  right: 15px;
+  font-weight: bold;
+  animation: fadeOutUp 5s forwards;
+}
+
+.money-animation.gain {
+  color: #28a745; /* Verde para ganancias */
+}
+
+.money-animation.loss {
+  color: #dc3545; /* Rojo para pérdidas */
+}
+
+@keyframes fadeOutUp {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+}

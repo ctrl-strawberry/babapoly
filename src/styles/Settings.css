@@ -1,0 +1,6 @@
+.settings-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 80px; /* Espacio para la barra de navegación inferior */
+}
