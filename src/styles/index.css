@@ -8,9 +8,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); /* Ejemplo de gradiente pastel */
   min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  /* display: flex; */ /* Eliminado para permitir que el contenido se extienda */
+  /* justify-content: center; */ /* Eliminado para permitir que el contenido se extienda */
+  /* align-items: center; */ /* Eliminado para permitir que el contenido se extienda */
+  padding: 0 10px; /* Añadir padding horizontal al body */
 }
 
 #root, .App {
@@ -18,8 +19,8 @@ body {
   height: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  /* align-items: center; */ /* Eliminado para permitir que el contenido se extienda */
+  /* justify-content: center; */ /* Eliminado para permitir que el contenido se extienda */
 }
 
 code {

@@ -1,16 +1,15 @@
 .player-card {
+  width: 100%; /* Ocupar todo el ancho disponible */
+  max-width: 500px; /* Limitar el ancho para pantallas muy anchas */
   background: rgba(255, 255, 255, 0.3);
   border-radius: 15px;
-  padding: 15px;
-  margin: 0;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-bottom: 10px; /* Añadir espacio entre las tarjetas */
+  box-shadow: 0 6px 6px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
   border: 1px solid rgba(255, 255, 255, 0.4);
   color: #333;
-  width: 100%; /* Ocupar todo el ancho disponible */
-  max-width: 400px; /* Limitar el ancho máximo del botón */
-  margin: 10px auto; /* Centrar el botón y añadir espacio vertical */
   display: flex;
   justify-content: space-between; /* Alinear nombre a la izquierda y dinero a la derecha */
   align-items: center;
@@ -23,7 +22,7 @@
 }
 
 .player-card.selected {
-  border: 2px solid #007bff; /* Borde azul para indicar selección */
+  border: 2px solid #3678ce; /* Borde azul para indicar selección */
   box-shadow: 0 0 15px rgba(0, 123, 255, 0.5); /* Sombra azul para resaltar */
 }
 
@@ -39,7 +38,7 @@
 
 .money-animation {
   position: absolute;
-  right: 15px;
+  right: 80px;
   font-weight: bold;
   animation: fadeOutUp 5s forwards;
 }
