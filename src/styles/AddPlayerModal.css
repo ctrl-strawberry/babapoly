@@ -1,0 +1,64 @@
+.add-player-modal-content {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 20px;
+    background-color: #282c34; /* Dark background */
+    border-radius: 8px;
+    color: white; /* White text */
+}
+
+.add-generic-button,
+.add-custom-button {
+    background-color: #61dafb; /* Light blue for buttons */
+    color: #282c34;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease;
+}
+
+.add-generic-button:hover,
+.add-custom-button:hover {
+    background-color: #21a1f1;
+}
+
+.custom-player-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.custom-player-form label {
+    display: flex;
+    flex-direction: column;
+    font-size: 0.9em;
+}
+
+.custom-player-form input[type="text"],
+.custom-player-form input[type="number"] {
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #61dafb;
+    background-color: #3a3f47; /* Slightly lighter dark for input */
+    color: white;
+}
+
+.custom-player-form input[type="file"] {
+    color: white;
+}
+
+.image-preview-container {
+    margin-top: 10px;
+    text-align: center;
+}
+
+.image-preview {
+    max-width: 100px;
+    max-height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #61dafb;
+}

@@ -12,6 +12,10 @@ function App() {
   return (
     <div className="App">
       <AppRouter players={players} setPlayers={setPlayers} potMoney={potMoney} setPotMoney={setPotMoney} />
+      <video autoPlay loop muted className="background-video">
+        <source src="/babapoly/images/videoplayback.mp4" type="video/mp4" />
+        Tu navegador no soporta la etiqueta de video.
+      </video>
     </div>
   );
 }

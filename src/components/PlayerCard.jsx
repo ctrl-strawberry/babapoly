@@ -1,9 +1,9 @@
 import React from 'react';
 import '../styles/PlayerCard.css';
 
-function PlayerCard({ player, onClick, isSelected, animationChange }) {
+function PlayerCard({ player, onClick, isSelected, animationChange, backgroundColor }) {
   return (
-    <button className={`player-card ${isSelected ? 'selected' : ''}`} onClick={onClick}>
+    <button className={`player-card ${isSelected ? 'selected' : ''}`} onClick={onClick} style={{ backgroundColor: backgroundColor }}>
       <img src={player.image || '/babapoly/images/jugador.png'} alt={player.name} className="player-image" />
       <div className="player-info">
         <span className="player-name">{player.name}</span>

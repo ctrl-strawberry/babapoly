@@ -27,7 +27,8 @@
 
 .add-player-section button,
 .settings-actions button {
-    background-color: #00ffff; /* Cyan for buttons */
+  background-color: #00ffff; /* Cyan for buttons */
+  padding-bottom: 10px; /* Added bottom padding */
     color: #1e1e1e;
     border: none;
     padding: 12px 20px;

@@ -3,10 +3,11 @@
   display: flex;
   flex-direction: row; /* Changed to row for elongated shape */
   align-items: center;
-  background-color: #2c2c2c;
+  background-color: rgba(44, 44, 44, 0.5);
+  backdrop-filter: blur(5px);
   border-radius: 10px;
   padding: 20px 20px 40px 80px; /* Increased bottom padding */
-  margin: 5px 0; /* Adjusted margin for full width */
+  margin: 5px 0 20px 0; /* Added bottom margin for spacing outside the button */
   width: 100%; /* Occupy full width */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   transition: transform 0.2s ease-in-out;
@@ -32,7 +33,7 @@
   mask-image: linear-gradient(to top, transparent, black 20%);
   -webkit-mask-image: linear-gradient(to top, transparent, black 20%);
   position: absolute; /* Position absolutely */
-  left: -20px; /* Adjust as needed to make it protrude */
+  left: 0; /* Align left edge of image with left edge of player-card */
   bottom: 0; /* Align bottom of image with bottom of player-card */
   z-index: 1;
 }
@@ -42,24 +43,33 @@
 .player-info {
   flex-grow: 1; /* Allow info to take available space */
   display: flex;
-  justify-content: space-between; /* Pushes money to the right */
-  align-items: center;
+  flex-direction: column; /* Change to column to stack name and money */
+  justify-content: flex-end; /* Push content to the bottom */
+  align-items: flex-end; /* Align content to the right */
+  position: relative; /* For absolute positioning of money */
 }
 
 .player-name {
   font-size: 1.2em;
+  font-family: 'Consolas', 'monospace';
   font-weight: bold;
   color: #ffffff;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  position: absolute;
+  top: -5px;
+  left: 0;
 }
 
 .player-money {
-  font-size: 1.1em;
+  font-size: 1.6em; /* Increased font size */
+  font-family: 'Consolas', 'monospace';
   color: #00bcd4;
-  font-weight: bold;
-  margin-left: auto;
+  
+  position: absolute;
+  bottom: -32px;
+  right: -10px;
 }
 
 .money-animation {
