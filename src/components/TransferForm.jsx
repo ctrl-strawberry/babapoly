@@ -28,27 +28,22 @@ function TransferForm({ players, bank, pot, onTransfer, potMoney, setPotMoney, i
 
   return (
     <form onSubmit={handleSubmit} className="transfer-form">
-      <h3>Realizar Transferencia</h3>
-      <select value={from} onChange={(e) => setFrom(e.target.value)}>
-        <option value="">Origen</option>
-        {allEntities.map(entity => (
-          <option key={entity.id} value={entity.id}>{entity.name}</option>
-        ))}
-      </select>
-      <select value={to} onChange={(e) => setTo(e.target.value)}>
-        <option value="">Destino</option>
-        {allEntities.map(entity => (
-          <option key={entity.id} value={entity.id}>{entity.name}</option>
-        ))}
-      </select>
+      <div className="terminal-header">
+        <span className="terminal-title">Transferencia de dinero</span>
+      </div>
+      <div className="transfer-display">
+        <span>{initialFrom ? initialFrom.name : 'Origen'}</span>
+        <span className="arrow"> &gt; </span>
+        <span>{initialTo ? initialTo.name : 'Destino'}</span>
+      </div>
       <input
         type="number"
         placeholder="Cantidad"
         value={amount}
         onChange={(e) => setAmount(e.target.value)}
+        autoFocus
       />
-      <button type="submit">Transferir</button>
-      <button type="button" onClick={onClose}>Cerrar</button>
+      <button type="submit">(t) Transferir</button>
     </form>
   );
 }

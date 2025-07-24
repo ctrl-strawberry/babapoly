@@ -79,14 +79,18 @@ function Home({ players, setPlayers, potMoney, setPotMoney }) {
 
   return (
     <div className="home-page">
-      <h2>Página de Inicio</h2>
+      <img src="/babapoly/images/logo.png" alt="Logo" className="home-logo" />
       <div className="players-grid">
         {players.map(player => (
           <PlayerCard
             key={player.id}
-            name={player.name}
-            money={player.money}
-            color={player.color}
+            player={{
+              id: player.id,
+              name: player.name,
+              money: player.money,
+              color: player.color,
+              image: player.image || '/babapoly/images/jugador.png' // Ensure image is always present
+            }}
             onClick={() => handlePlayerClick(player)}
             isSelected={selectedPlayers.some(p => p.id === player.id)}
             animationChange={animationData[player.id]}
@@ -94,18 +98,26 @@ function Home({ players, setPlayers, potMoney, setPotMoney }) {
         ))}
         <PlayerCard
             key={bank.id}
-            name={bank.name}
-            money={bank.money}
-            color={bank.color}
+            player={{
+              id: bank.id,
+              name: bank.name,
+              money: bank.money,
+              color: bank.color,
+              image: '/babapoly/images/banco.png' // Specific image for bank
+            }}
             onClick={() => handlePlayerClick(bank)}
             isSelected={selectedPlayers.some(p => p.id === bank.id)}
             animationChange={animationData[bank.id]}
           />
         <PlayerCard
             key={pot.id}
-            name={pot.name}
-            money={pot.money}
-            color={pot.color}
+            player={{
+              id: pot.id,
+              name: pot.name,
+              money: pot.money,
+              color: pot.color,
+              image: '/babapoly/images/bote.png' // Specific image for pot
+            }}
             onClick={() => handlePlayerClick(pot)}
             isSelected={selectedPlayers.some(p => p.id === pot.id)}
             animationChange={animationData[pot.id]}

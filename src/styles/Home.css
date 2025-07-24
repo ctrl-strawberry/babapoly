@@ -1,4 +1,5 @@
 .home-page {
+
   display: flex;
   flex-direction: column;
   align-items: center; /* Reintroducido para centrar los elementos */
@@ -13,4 +14,10 @@
   width: 100%; /* Ajustar el ancho para que los botones sean largos */
   max-width: 500px; /* Limitar el ancho máximo para pantallas grandes */
   padding: 0 10px; /* Añadir padding horizontal para que no toquen los bordes */
+}
+
+.home-logo {
+  width: 300px; /* Doubled size */
+  margin-bottom: 20px;
+  padding-top: 50px; /* Added top padding */
 }

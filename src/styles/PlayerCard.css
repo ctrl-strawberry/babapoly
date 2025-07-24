@@ -1,63 +1,94 @@
+/* PlayerCard.css */
 .player-card {
-  width: 100%; /* Ocupar todo el ancho disponible */
-  max-width: 500px; /* Limitar el ancho para pantallas muy anchas */
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 15px;
-  padding: 20px;
-  margin-bottom: 10px; /* Añadir espacio entre las tarjetas */
-  box-shadow: 0 6px 6px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  color: #333;
   display: flex;
-  justify-content: space-between; /* Alinear nombre a la izquierda y dinero a la derecha */
+  flex-direction: row; /* Changed to row for elongated shape */
   align-items: center;
-  cursor: pointer;
+  background-color: #2c2c2c;
+  border-radius: 10px;
+  padding: 20px 20px 40px 80px; /* Increased bottom padding */
+  margin: 5px 0; /* Adjusted margin for full width */
+  width: 100%; /* Occupy full width */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   transition: transform 0.2s ease-in-out;
+  position: relative;
+
+  cursor: pointer; /* Indicate it's a button */
+  border: none; /* Remove button default border */
 }
 
 .player-card:hover {
-  transform: translateY(-3px);
+  transform: translateY(-2px); /* Slightly less movement for elongated button */
 }
 
 .player-card.selected {
-  border: 2px solid #3678ce; /* Borde azul para indicar selección */
-  box-shadow: 0 0 15px rgba(0, 123, 255, 0.5); /* Sombra azul para resaltar */
+  border: 2px solid #00bcd4; /* Highlight selected player */
+}
+
+.player-image {
+  width: 100px; /* Larger image to protrude */
+  height: 100px;
+  border-radius: 0;
+  object-fit: contain;
+  mask-image: linear-gradient(to top, transparent, black 20%);
+  -webkit-mask-image: linear-gradient(to top, transparent, black 20%);
+  position: absolute; /* Position absolutely */
+  left: -20px; /* Adjust as needed to make it protrude */
+  bottom: 0; /* Align bottom of image with bottom of player-card */
+  z-index: 1;
+}
+
+
+
+.player-info {
+  flex-grow: 1; /* Allow info to take available space */
+  display: flex;
+  justify-content: space-between; /* Pushes money to the right */
+  align-items: center;
 }
 
 .player-name {
+  font-size: 1.2em;
   font-weight: bold;
-  color: #696969;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .player-money {
+  font-size: 1.1em;
+  color: #00bcd4;
   font-weight: bold;
-  color: #4CAF50; /* Color para el dinero */
+  margin-left: auto;
 }
 
 .money-animation {
   position: absolute;
-  right: 80px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 2em;
   font-weight: bold;
-  animation: fadeOutUp 5s forwards;
+  opacity: 0;
+  animation: fadeOut 5s forwards;
+  z-index: 10;
 }
 
 .money-animation.gain {
-  color: #4fd12e; /* Verde para ganancias */
+  color: #4CAF50; /* Green for gain */
 }
 
 .money-animation.loss {
-  color: #dc3545; /* Rojo para pérdidas */
+  color: #F44336; /* Red for loss */
 }
 
-@keyframes fadeOutUp {
+@keyframes fadeOut {
   0% {
     opacity: 1;
-    transform: translateY(0);
+    transform: translate(-50%, -50%) scale(1);
   }
   100% {
     opacity: 0;
-    transform: translateY(-20px);
+    transform: translate(-50%, -100%) scale(0.5);
   }
 }

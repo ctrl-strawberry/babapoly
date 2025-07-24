@@ -20,13 +20,14 @@
   flex-direction: column;
   align-items: center;
   text-decoration: none;
-  color: #666; /* Iconos grises */
+  color: #cccccc; /* Gris más claro */
   font-size: 0.8em;
   transition: color 0.3s ease;
 }
 
 .nav-item.active {
-  color: #333; /* Color más oscuro para el activo */
+  color: #ffffff; /* Blanco para el activo */
+  font-weight: bold;
 }
 
 .nav-item span {
