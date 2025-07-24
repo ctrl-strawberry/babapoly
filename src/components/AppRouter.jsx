@@ -8,7 +8,7 @@ import '../styles/navigation.css';
 
 function AppRouter({ players, setPlayers, potMoney, setPotMoney }) {
   return (
-    <Router>
+    <Router basename="/babapoly/">
       <div className="app-container">
         <Routes>
           <Route path="/" element={<Home players={players} setPlayers={setPlayers} potMoney={potMoney} setPotMoney={setPotMoney} />} />
