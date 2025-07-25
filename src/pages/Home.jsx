@@ -76,7 +76,6 @@ function Home({ players, setPlayers, potMoney, setPotMoney }) {
         }, 5000); // La animación dura 5 segundos
       }
     });
-    });
   };
 
   return (
