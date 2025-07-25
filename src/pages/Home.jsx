@@ -53,33 +53,35 @@ function Home({ players, setPlayers, potMoney, setPotMoney }) {
         setPotMoney(prev => prev + amount);
       }
 
-      const updatedPlayers = newPlayers.map(player => {
-        let change = 0;
-        if (player.id === fromId) {
-          change = -amount;
-        } else if (player.id === toId) {
-          change = amount;
-        }
-        if (change !== 0) {
-          setAnimationData(prev => ({ ...prev, [player.id]: change }));
-          setTimeout(() => {
-            setAnimationData(prev => {
-              const newAnim = { ...prev };
-              delete newAnim[player.id];
-              return newAnim;
-            });
-          }, 5000); // La animación dura 5 segundos
-        }
-        return player;
-      });
+      return newPlayers;
+    });
 
-      return updatedPlayers;
+    // Calculate and trigger animations after the player money has been updated
+    const playersToAnimate = players.filter(player => player.id === fromId || player.id === toId);
+    playersToAnimate.forEach(player => {
+      let change = 0;
+      if (player.id === fromId) {
+        change = -amount;
+      } else if (player.id === toId) {
+        change = amount;
+      }
+      if (change !== 0) {
+        setAnimationData(prev => ({ ...prev, [player.id]: change }));
+        setTimeout(() => {
+          setAnimationData(prev => {
+            const newAnim = { ...prev };
+            delete newAnim[player.id];
+            return newAnim;
+          });
+        }, 5000); // La animación dura 5 segundos
+      }
+    });
     });
   };
 
   return (
     <div className="home-page">
-      <img src="/babapoly/images/logo.png" alt="Logo" className="home-logo" />
+      <img src="/images/logo.png" alt="Logo" className="home-logo" />
       <div className="players-grid">
         {players.map(player => (
           <PlayerCard
@@ -89,7 +91,7 @@ function Home({ players, setPlayers, potMoney, setPotMoney }) {
               name: player.name,
               money: player.money,
               color: player.color,
-              image: player.image || '/babapoly/images/jugador.png' // Ensure image is always present
+              image: player.image || '/images/jugador.png' // Ensure image is always present
             }}
             onClick={() => handlePlayerClick(player)}
             isSelected={selectedPlayers.some(p => p.id === player.id)}
@@ -103,7 +105,7 @@ function Home({ players, setPlayers, potMoney, setPotMoney }) {
               name: bank.name,
               money: bank.money,
               color: bank.color,
-              image: '/babapoly/images/banco.png' // Specific image for bank
+              image: '/images/banco.png' // Specific image for bank
             }}
             onClick={() => handlePlayerClick(bank)}
             isSelected={selectedPlayers.some(p => p.id === bank.id)}
@@ -116,7 +118,7 @@ function Home({ players, setPlayers, potMoney, setPotMoney }) {
               name: pot.name,
               money: pot.money,
               color: pot.color,
-              image: '/babapoly/images/bote.png' // Specific image for pot
+              image: '/images/bote.png' // Specific image for pot
             }}
             onClick={() => handlePlayerClick(pot)}
             isSelected={selectedPlayers.some(p => p.id === pot.id)}

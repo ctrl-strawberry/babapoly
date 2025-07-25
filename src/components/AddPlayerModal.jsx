@@ -29,7 +29,7 @@ function AddPlayerModal({ onClose, onAddPlayer, players }) {
       name: 'Jugador',
       money: 1500,
       color: `#${Math.floor(Math.random()*16777215).toString(16)}`,
-      image: '/babapoly/images/jugador.png'
+      image: '/images/jugador.png'
     };
     onAddPlayer(genericPlayer);
     onClose();
@@ -43,7 +43,7 @@ function AddPlayerModal({ onClose, onAddPlayer, players }) {
       name: newPlayerName,
       money: newPlayerMoney,
       color: `#${Math.floor(Math.random()*16777215).toString(16)}`,
-      image: imagePreview || '/babapoly/images/jugador.png' // Use uploaded image or generic
+      image: imagePreview || '/images/jugador.png' // Use uploaded image or generic
     };
     onAddPlayer(customPlayer);
     onClose();
