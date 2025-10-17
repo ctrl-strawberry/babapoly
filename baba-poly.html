@@ -37,28 +37,34 @@
         </p>
         <div id="jimboSelect" class="selector-grid"></div>
         <div id="battleStage" class="battle-stage" hidden>
-          <div class="battle-entities">
-            <div class="battle-entity">
-              <div class="health-bar">
-                <span id="playerPetLabel"></span>
-                <div class="bar">
-                  <div class="bar-fill" id="playerHealthFill"></div>
-                </div>
-                <small class="helper-text" id="playerHealthText"></small>
+          <div class="battle-scene">
+            <img src="assets/campo.gif" alt="Campo de batalla" loading="lazy">
+            <div class="battle-info battle-info-player">
+              <div class="battle-info-head">
+                <span id="playerPetLabel" class="battle-info-name"></span>
+                <div class="battle-info-level" id="playerLevelLabel"></div>
+              </div>
+              <div class="bar">
+                <div class="bar-fill" id="playerHealthFill"></div>
+                <span class="bar-value" id="playerHealthText"></span>
               </div>
             </div>
-            <div class="battle-entity">
-              <div class="health-bar">
-                <span id="enemyLabel"></span>
-                <div class="bar">
-                  <div class="bar-fill enemy" id="enemyHealthFill"></div>
-                </div>
-                <small class="helper-text" id="enemyHealthText"></small>
+            <div class="battle-info battle-info-enemy">
+              <div class="battle-info-head">
+                <span id="enemyLabel" class="battle-info-name"></span>
+                <div class="battle-info-level" id="enemyLevelLabel"></div>
+              </div>
+              <div class="bar">
+                <div class="bar-fill enemy" id="enemyHealthFill"></div>
+                <span class="bar-value" id="enemyHealthText"></span>
               </div>
             </div>
+            <img src="assets/mascota.webp" alt="Mascota del jugador" class="battle-character battle-character-player" loading="lazy">
+            <img src="assets/enemigo.gif" alt="Enemigo" class="battle-character battle-character-enemy" loading="lazy">
           </div>
-          <div id="attackGrid" class="attack-grid"></div>
-          <div class="battle-log" id="battleLog" aria-live="polite"></div>
+          <div class="battle-panel">
+            <div id="attackGrid" class="attack-grid"></div>
+          </div>
         </div>
       </section>
 

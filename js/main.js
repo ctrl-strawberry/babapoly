@@ -31,7 +31,8 @@ const enemyHealthFill = document.getElementById("enemyHealthFill");
 const playerHealthText = document.getElementById("playerHealthText");
 const enemyHealthText = document.getElementById("enemyHealthText");
 const attackGrid = document.getElementById("attackGrid");
-const battleLog = document.getElementById("battleLog");
+const playerLevelLabel = document.getElementById("playerLevelLabel");
+const enemyLevelLabel = document.getElementById("enemyLevelLabel");
 
 const roulettePlayer = document.getElementById("roulettePlayer");
 const rouletteAmount = document.getElementById("rouletteAmount");
@@ -70,13 +71,14 @@ jimboApi = initJimbo({
   playerSelectTemplate,
   battleStage,
   attackGrid,
-  battleLog,
   playerPetLabel,
   enemyLabel,
   playerHealthFill,
   enemyHealthFill,
   playerHealthText,
   enemyHealthText,
+  playerLevelLabel,
+  enemyLevelLabel,
   showToast,
   showScreen: (screenId) => showScreen(screenId),
   homeActions: {

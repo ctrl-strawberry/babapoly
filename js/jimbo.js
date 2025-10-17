@@ -25,25 +25,21 @@ export const initJimbo = ({
   playerSelectTemplate,
   battleStage,
   attackGrid,
-  battleLog,
   playerPetLabel,
   enemyLabel,
   playerHealthFill,
   enemyHealthFill,
   playerHealthText,
   enemyHealthText,
+  playerLevelLabel,
+  enemyLevelLabel,
   showToast,
   showScreen,
   homeActions,
 }) => {
   let battleState = null;
 
-  const appendLog = (message) => {
-    const line = document.createElement("span");
-    line.textContent = message;
-    battleLog.appendChild(line);
-    battleLog.scrollTop = battleLog.scrollHeight;
-  };
+  const appendLog = () => {};
 
   const lockAttacks = (locked) => {
     attackGrid
@@ -59,16 +55,17 @@ export const initJimbo = ({
 
     playerHealthFill.style.width = `${playerPercent}%`;
     enemyHealthFill.style.width = `${enemyPercent}%`;
-    playerHealthText.textContent = `${Math.max(0, playerHp)} / ${playerMaxHp} HP`;
-    enemyHealthText.textContent = `${Math.max(0, enemyHp)} / ${enemyMaxHp} HP`;
+    if (playerHealthText) playerHealthText.textContent = `${Math.max(0, playerHp)}`;
+    if (enemyHealthText) enemyHealthText.textContent = `${Math.max(0, enemyHp)}`;
   };
 
   const clearBattle = () => {
     battleState = null;
     playerSelectContainer.hidden = false;
     battleStage.hidden = true;
-    battleLog.innerHTML = "";
     attackGrid.innerHTML = "";
+    if (playerLevelLabel) playerLevelLabel.textContent = "";
+    if (enemyLevelLabel) enemyLevelLabel.textContent = "";
   };
 
   const renderAttacks = (level) => {
@@ -121,6 +118,7 @@ export const initJimbo = ({
       if (player.pet.xp >= threshold) {
         player.pet.level += 1;
         player.pet.xp = 0;
+        if (playerLevelLabel) playerLevelLabel.textContent = player.pet.level;
         appendLog(`La mascota sube a nivel ${player.pet.level}. Nuevos ataques disponibles.`);
       } else {
         appendLog(`Gana ${reward} monedas y ${xpGain.toFixed(2)} de XP.`);
@@ -186,9 +184,10 @@ export const initJimbo = ({
 
     playerSelectContainer.hidden = true;
     battleStage.hidden = false;
-    battleLog.innerHTML = "";
-    playerPetLabel.textContent = `${player.name} · Mascota nivel ${petLevel}`;
-    enemyLabel.textContent = `${battleState.enemyName} · Nivel ${enemyLevel}`;
+    playerPetLabel.textContent = player.name;
+    if (playerLevelLabel) playerLevelLabel.textContent = petLevel;
+    enemyLabel.textContent = battleState.enemyName;
+    if (enemyLevelLabel) enemyLevelLabel.textContent = enemyLevel;
     updateHealthBars();
     renderAttacks(petLevel);
     appendLog(`¡${player.name} entra en combate!`);
@@ -201,7 +200,7 @@ export const initJimbo = ({
       const card = playerSelectTemplate.content.firstElementChild.cloneNode(true);
       card.dataset.playerId = player.id;
       card.querySelector(".player-name").textContent = player.name;
-      card.querySelector(".player-money").textContent = `${player.money.toLocaleString("es-ES")} monedas · Nivel mascota ${player.pet.level}`;
+      card.querySelector(".player-money").textContent = `${player.money.toLocaleString("es-ES")} monedas · Nivel ${player.pet.level}`;
       card.querySelector("button").addEventListener("click", () => startBattle(player.id));
       playerSelectContainer.appendChild(card);
     });
