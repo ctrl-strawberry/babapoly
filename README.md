@@ -1,6 +1,6 @@
 # Baba Poly
 
-Aplicación web single-page para gestionar jugadores y minijuegos inspirados en un tablero clásico. Permite administrar una plantilla de participantes, transferir dinero entre ellos y disputar dos minijuegos: **Jimbo**, una batalla por turnos estilo RPG, y **Ruleta**, un giro clásico con apuestas numéricas.
+Aplicación web single-page para gestionar jugadores y minijuegos de una versión modificada del popular juego Monopoly. Permite administrar una plantilla de participantes, transferir dinero entre ellos y disputar dos minijuegos: **Jimbo**, una batalla por turnos estilo RPG, y **Ruleta**, un giro clásico con apuestas numéricas.
 
 ## Características principales
 
