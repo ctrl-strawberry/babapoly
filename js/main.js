@@ -33,6 +33,8 @@ const enemyHealthText = document.getElementById("enemyHealthText");
 const attackGrid = document.getElementById("attackGrid");
 const playerLevelLabel = document.getElementById("playerLevelLabel");
 const enemyLevelLabel = document.getElementById("enemyLevelLabel");
+const playerCharacterSprite = document.querySelector(".battle-character-player");
+const enemyCharacterSprite = document.querySelector(".battle-character-enemy");
 
 const roulettePlayer = document.getElementById("roulettePlayer");
 const rouletteAmount = document.getElementById("rouletteAmount");
@@ -79,6 +81,8 @@ jimboApi = initJimbo({
   enemyHealthText,
   playerLevelLabel,
   enemyLevelLabel,
+  playerCharacter: playerCharacterSprite,
+  enemyCharacter: enemyCharacterSprite,
   showToast,
   showScreen: (screenId) => showScreen(screenId),
   homeActions: {

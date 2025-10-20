@@ -33,6 +33,8 @@ export const initJimbo = ({
   enemyHealthText,
   playerLevelLabel,
   enemyLevelLabel,
+  playerCharacter,
+  enemyCharacter,
   showToast,
   showScreen,
   homeActions,
@@ -40,6 +42,35 @@ export const initJimbo = ({
   let battleState = null;
 
   const appendLog = () => {};
+
+  const playSpriteAnimation = (element, className) => {
+    if (!element) return;
+    element.classList.remove(className);
+    // Reinicia la animación forzando un reflow
+    void element.offsetWidth;
+    element.classList.add(className);
+    const handleAnimationEnd = () => {
+      element.classList.remove(className);
+      element.removeEventListener("animationend", handleAnimationEnd);
+    };
+    element.addEventListener("animationend", handleAnimationEnd);
+  };
+
+  const triggerAttackAnimation = (side) => {
+    if (side === "player") {
+      playSpriteAnimation(playerCharacter, "attack-player");
+    } else {
+      playSpriteAnimation(enemyCharacter, "attack-enemy");
+    }
+  };
+
+  const triggerHitAnimation = (side) => {
+    if (side === "player") {
+      playSpriteAnimation(playerCharacter, "hit");
+    } else {
+      playSpriteAnimation(enemyCharacter, "hit");
+    }
+  };
 
   const lockAttacks = (locked) => {
     attackGrid
@@ -64,6 +95,12 @@ export const initJimbo = ({
     playerSelectContainer.hidden = false;
     battleStage.hidden = true;
     attackGrid.innerHTML = "";
+    if (playerCharacter) {
+      playerCharacter.classList.remove("attack-player", "hit");
+    }
+    if (enemyCharacter) {
+      enemyCharacter.classList.remove("attack-enemy", "hit");
+    }
     if (playerLevelLabel) playerLevelLabel.textContent = "";
     if (enemyLevelLabel) enemyLevelLabel.textContent = "";
   };
@@ -86,6 +123,7 @@ export const initJimbo = ({
 
   const executeEnemyAttack = () => {
     if (!battleState) return;
+    triggerAttackAnimation("enemy");
     const damage = randomBetween(
       10 + battleState.enemyLevel * 2,
       18 + battleState.enemyLevel * 3,
@@ -93,6 +131,7 @@ export const initJimbo = ({
     battleState.playerHp = Math.max(0, battleState.playerHp - damage);
     appendLog(`${battleState.enemyName} golpea y hace ${damage} de daño.`);
     updateHealthBars();
+    triggerHitAnimation("player");
     if (battleState.playerHp <= 0) {
       handleBattleEnd("lose");
     } else {
@@ -150,10 +189,12 @@ export const initJimbo = ({
     if (!battleState) return;
     battleState.locked = true;
     lockAttacks(true);
+    triggerAttackAnimation("player");
     const damage = randomBetween(attack.min, attack.max);
     battleState.enemyHp = Math.max(0, battleState.enemyHp - damage);
     appendLog(`Tu mascota usa ${attack.name} y causa ${damage} de daño.`);
     updateHealthBars();
+    triggerHitAnimation("enemy");
     if (battleState.enemyHp <= 0) {
       handleBattleEnd("win");
     } else {
