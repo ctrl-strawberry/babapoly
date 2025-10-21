@@ -4,9 +4,9 @@ export const STORAGE_KEY = "baba-poly-state-v1";
 
 export const createDefaultState = () => ({
   players: [
-    { id: crypto.randomUUID(), name: "Rosi", money: 800, pet: { level: 1, xp: 0 } },
-    { id: crypto.randomUUID(), name: "Nico", money: 650, pet: { level: 1, xp: 0 } },
-    { id: crypto.randomUUID(), name: "Pilar", money: 900, pet: { level: 2, xp: 0.5 } }
+    { id: crypto.randomUUID(), name: "Rosi", money: 800, pet: { level: 1, xp: 0 }, avatar: null },
+    { id: crypto.randomUUID(), name: "Nico", money: 650, pet: { level: 1, xp: 0 }, avatar: null },
+    { id: crypto.randomUUID(), name: "Pilar", money: 900, pet: { level: 2, xp: 0.5 }, avatar: null }
   ],
   pot: 0
 });
@@ -19,8 +19,13 @@ export const loadState = () => {
     }
     const parsed = JSON.parse(stored);
     if (Array.isArray(parsed.players)) {
+      const normalizedPlayers = parsed.players.map((player) => ({
+        ...player,
+        avatar: typeof player?.avatar === "string" ? player.avatar : null,
+      }));
       return {
         ...parsed,
+        players: normalizedPlayers,
         pot: typeof parsed.pot === "number" && Number.isFinite(parsed.pot) && parsed.pot >= 0
           ? parsed.pot
           : 0,

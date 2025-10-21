@@ -34,3 +34,38 @@ Aplicación web single-page para gestionar jugadores y minijuegos de una versió
 2. **Jimbo**: seleccionar jugador, combatir contra enemigos generados según nivel; volverá a Inicio mostrando la animación de dinero.
 3. **Ruleta**: escoger jugador, apuesta y número; tras el giro se vuelve a Inicio con el resultado.
 
+## Backend ligero para el avatar IA
+
+La clave de Google Gemini **no** debe vivir en el frontend. Para mantener GitHub Pages y proteger el secreto puedes desplegar un Worker (por ejemplo en Cloudflare). En este repositorio encontrarás un ejemplo en `server/cloudflare-edit-avatar.js`.
+
+### Pasos recomendados
+
+1. **Crear el Worker**
+   ```bash
+   npm create cloudflare@latest
+   # copia server/cloudflare-edit-avatar.js como src/index.js del worker
+   ```
+2. **Configurar secretos**
+   ```bash
+   npx wrangler secret put GOOGLE_AI_KEY
+   # pega tu key de AI Studio cuando lo pida
+   ```
+3. **Desplegar**
+   ```bash
+   npx wrangler deploy
+   ```
+   La salida mostrará la URL pública del Worker (p. ej. `https://baba-poly-worker.example.workers.dev/api/edit-avatar`).
+4. **Apuntar el frontend al Worker**
+   En tu `index.html` define la URL antes de cargar los scripts:
+   ```html
+   <script>
+     window.BABA_POLY_AVATAR_ENDPOINT = "https://tu-worker.workers.dev/api/edit-avatar";
+   </script>
+   ```
+
+### Consideraciones
+
+- GitHub Pages sólo sirve archivos estáticos; necesitas un servicio aparte (Cloudflare Workers, Vercel, Netlify Functions, etc.) para ejecutar el backend.
+- El Worker expone CORS abierto (`Access-Control-Allow-Origin: *`). Ajusta la cabecera si quieres restringirlo a tu dominio.
+- Si el backend no responde, el frontend usará la imagen original sin estilizar.
+- Puedes reutilizar el mismo patrón en otros proveedores: basta con reenviar `{ image, mimeType }` a la API de Google utilizando la clave almacenada como variable de entorno.

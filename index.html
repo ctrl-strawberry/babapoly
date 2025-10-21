@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Baba Poly</title>
+  <script>
+    window.BABA_POLY_AVATAR_ENDPOINT = "https://baba-poly-worker.babapoly.workers.dev/api/edit-avatar";
+  </script>
   <link rel="icon" type="image/png" href="assets/logo.png">
   <link rel="stylesheet" href="css/baba-poly.css">
   <link rel="stylesheet" href="css/navbar.css">
@@ -99,7 +102,8 @@
           <div class="player-name"></div>
           <div class="player-money"></div>
         </div>
-        <div class="player-actions" hidden>
+        <div class="player-actions">
+          <img class="player-avatar" alt="">
           <button class="player-delete-btn" data-action="delete" title="Eliminar jugador" aria-label="Eliminar jugador">&times;</button>
         </div>
       </div>
