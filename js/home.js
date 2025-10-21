@@ -7,7 +7,6 @@ import {
 } from "./state.js";
 import { formatMoney } from "./utils.js";
 
-const TRANSFER_DEFAULT = 50;
 const BANK_PLAYER_ID = "bank";
 const BANK_PLAYER_NAME = "Banca";
 const POT_PLAYER_ID = "pot";
@@ -133,6 +132,11 @@ export const initHome = ({
 
     modalContainer.appendChild(modal);
     activeModal = modal;
+    requestAnimationFrame(() => {
+      amountInput.focus({ preventScroll: true });
+      amountInput.select();
+      amountInput.scrollIntoView({ block: "center" });
+    });
   };
 
   const launchTransferModal = (fromId, toId) => {
@@ -147,9 +151,6 @@ export const initHome = ({
     const sourceMax = Number.isFinite(sourcePlayer.money)
       ? sourcePlayer.money
       : null;
-    const initialAmount = sourceMax !== null
-      ? Math.min(TRANSFER_DEFAULT, sourceMax || 1)
-      : TRANSFER_DEFAULT;
     const maxAttribute =
       sourceMax !== null ? `max="${sourceMax}"` : "";
 
@@ -163,7 +164,7 @@ export const initHome = ({
         </p>
         <form>
           <label for="transferAmount">Cantidad</label>
-          <input id="transferAmount" type="number" min="1" ${maxAttribute} value="${initialAmount}" required>
+          <input id="transferAmount" type="number" min="1" ${maxAttribute} inputmode="decimal" autocomplete="off" required>
           <div class="modal-actions">
             <button class="btn btn-ghost" type="button" data-action="cancel">Cancelar</button>
             <button class="btn btn-primary" type="submit">Transferir</button>
@@ -174,11 +175,23 @@ export const initHome = ({
 
     const form = modal.querySelector("form");
     const amountInput = form.querySelector("#transferAmount");
+    amountInput.addEventListener("input", () => amountInput.setCustomValidity(""));
 
     form.addEventListener("submit", (event) => {
       event.preventDefault();
-      const amount = Number(amountInput.value);
-      if (!Number.isFinite(amount) || amount <= 0) return;
+      amountInput.setCustomValidity("");
+      const rawValue = amountInput.value.trim();
+      if (!rawValue.length) {
+        amountInput.setCustomValidity("Introduce una cantidad válida");
+        amountInput.reportValidity();
+        return;
+      }
+      const amount = Number(rawValue);
+      if (!Number.isFinite(amount) || amount <= 0) {
+        amountInput.setCustomValidity("Introduce una cantidad válida");
+        amountInput.reportValidity();
+        return;
+      }
       if (Number.isFinite(sourceMax) && amount > sourceMax) {
         amountInput.setCustomValidity("No hay suficientes monedas");
         amountInput.reportValidity();
@@ -218,6 +231,11 @@ export const initHome = ({
 
     modalContainer.appendChild(modal);
     activeModal = modal;
+    requestAnimationFrame(() => {
+      amountInput.focus({ preventScroll: true });
+      amountInput.select();
+      amountInput.scrollIntoView({ block: "center" });
+    });
   };
 
   const openAddPlayerModal = () => {

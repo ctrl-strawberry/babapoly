@@ -450,6 +450,7 @@ section.active {
   backdrop-filter: blur(6px);
   z-index: 20;
   animation: fade-in 0.2s ease both;
+  overflow-y: auto;
 }
 
 .modal {
@@ -458,6 +459,8 @@ section.active {
   border-radius: 20px;
   padding: 1.75rem;
   box-shadow: 0 28px 80px -48px rgba(12, 15, 30, 0.8);
+  max-height: calc(100vh - 3rem);
+  overflow-y: auto;
 }
 
 .modal h2 {
@@ -490,6 +493,19 @@ select {
 
 input[type="range"] {
   accent-color: var(--primary);
+}
+
+@media (max-width: 600px) {
+  .modal-backdrop {
+    align-items: flex-start;
+    padding: 1.25rem 1rem;
+  }
+
+  .modal {
+    margin-top: clamp(1rem, 8vh, 2.5rem);
+    max-height: calc(100vh - 2rem);
+    padding: 1.5rem;
+  }
 }
 
 .modal-actions {
