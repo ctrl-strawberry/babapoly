@@ -40,6 +40,7 @@
   transition: color 0.2s ease;
   position: relative;
   z-index: 2;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .bottom-tabs .tab svg {
@@ -74,6 +75,13 @@
 
 #bottom-nav-ruleta:checked ~ .glider {
   transform: translate(calc(200% + 0.8rem), -50%);
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .bottom-tabs .tab:focus,
+  .bottom-tabs .tab:focus-visible {
+    outline: none;
+  }
 }
 
 @media (max-width: 700px) {

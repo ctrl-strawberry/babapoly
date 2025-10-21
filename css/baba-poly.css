@@ -52,6 +52,17 @@ button:focus-visible {
   outline-offset: 3px;
 }
 
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  button:focus,
+  button:focus-visible {
+    outline: none;
+  }
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
