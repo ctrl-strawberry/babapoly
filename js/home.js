@@ -22,6 +22,8 @@ export const initHome = ({
   let editingMode = false;
   let activeModal = null;
 
+  addPlayerBtn.hidden = true;
+
   const clearTransferSelection = () => {
     transferState.from = null;
     transferState.to = null;
@@ -70,9 +72,40 @@ export const initHome = ({
     requestAnimationFrame(() => targetCard.classList.add("is-animating"));
   };
 
-  const handlePlayerDelete = (playerId) => {
-    deletePlayer(playerId);
-    renderPlayers();
+  const openDeleteConfirmModal = (playerId) => {
+    const player = getPlayerById(playerId);
+    if (!player) return;
+
+    closeModal();
+
+    const modal = document.createElement("div");
+    modal.className = "modal-backdrop";
+    modal.innerHTML = `
+      <div class="modal" role="dialog" aria-modal="true">
+        <h2>Eliminar jugador</h2>
+        <p>¿Seguro que quieres eliminar a <strong>${player.name}</strong>?</p>
+        <div class="modal-actions">
+          <button class="btn btn-ghost" type="button" data-action="cancel">Cancelar</button>
+          <button class="btn btn-danger" type="button" data-action="confirm">SI</button>
+        </div>
+      </div>
+    `;
+
+    modal.querySelector("[data-action='cancel']").addEventListener("click", closeModal);
+    modal.querySelector("[data-action='confirm']").addEventListener("click", () => {
+      deletePlayer(playerId);
+      closeModal();
+      renderPlayers();
+    });
+
+    modal.addEventListener("click", (event) => {
+      if (event.target === modal) {
+        closeModal();
+      }
+    });
+
+    modalContainer.appendChild(modal);
+    activeModal = modal;
   };
 
   const launchTransferModal = (fromId, toId) => {
@@ -139,6 +172,8 @@ export const initHome = ({
   };
 
   const openAddPlayerModal = () => {
+    if (!editingMode) return;
+
     closeModal();
 
     const modal = document.createElement("div");
@@ -239,17 +274,51 @@ export const initHome = ({
       card.querySelector(".player-name").textContent = player.name;
       card.querySelector(".player-money").textContent = formatMoney(player.money);
 
-      const actionContainer = card.querySelector(".player-actions");
-      if (editingMode) {
-        actionContainer.hidden = false;
-        actionContainer
-          .querySelector("[data-action='delete']")
-          .addEventListener("click", (event) => {
-            event.stopPropagation();
-            handlePlayerDelete(player.id);
-          });
-      } else {
+      let actionContainer = card.querySelector(".player-actions");
+      if (!actionContainer) {
+        const content = card.querySelector(".player-card-content");
+        actionContainer = document.createElement("div");
+        actionContainer.className = "player-actions";
         actionContainer.hidden = true;
+
+        const deleteButton = document.createElement("button");
+        deleteButton.className = "player-delete-btn";
+        deleteButton.dataset.action = "delete";
+        deleteButton.type = "button";
+        deleteButton.title = "Eliminar jugador";
+        deleteButton.setAttribute("aria-label", "Eliminar jugador");
+        deleteButton.textContent = "×";
+        actionContainer.appendChild(deleteButton);
+
+        content?.appendChild(actionContainer);
+      }
+
+      if (actionContainer) {
+        let deleteButton = actionContainer.querySelector("[data-action='delete']");
+        if (!deleteButton) {
+          deleteButton = document.createElement("button");
+          deleteButton.className = "player-delete-btn";
+          deleteButton.dataset.action = "delete";
+          deleteButton.type = "button";
+          deleteButton.title = "Eliminar jugador";
+          deleteButton.setAttribute("aria-label", "Eliminar jugador");
+          deleteButton.textContent = "×";
+          actionContainer.appendChild(deleteButton);
+        }
+
+        if (editingMode) {
+          actionContainer.hidden = false;
+          card.classList.add("show-actions");
+          if (deleteButton) {
+            deleteButton.addEventListener("click", (event) => {
+              event.stopPropagation();
+              openDeleteConfirmModal(player.id);
+            });
+          }
+        } else {
+          actionContainer.hidden = true;
+          card.classList.remove("show-actions");
+        }
       }
 
       card.addEventListener("click", () => handlePlayerClick(card, player.id));
@@ -264,6 +333,7 @@ export const initHome = ({
     settingsToggle.classList.toggle("active", editingMode);
     settingsToggle.setAttribute("aria-pressed", String(editingMode));
     playerToolbar.hidden = !editingMode;
+    addPlayerBtn.hidden = !editingMode;
     clearTransferSelection();
     renderPlayers();
   };
@@ -274,6 +344,7 @@ export const initHome = ({
     settingsToggle.classList.remove("active");
     settingsToggle.setAttribute("aria-pressed", "false");
     playerToolbar.hidden = true;
+    addPlayerBtn.hidden = true;
     clearTransferSelection();
     renderPlayers();
   };
