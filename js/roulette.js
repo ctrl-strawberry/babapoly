@@ -1,4 +1,4 @@
-import { saveState, getPlayerById } from "./state.js";
+import { saveState, getPlayerById, addToPot } from "./state.js";
 import { formatMoney, randomBetween } from "./utils.js";
 
 export const initRoulette = ({
@@ -47,7 +47,7 @@ export const initRoulette = ({
       homeActions.showMoneyAnimation(player.id, prize);
     } else {
       rouletteHelper.textContent = `No fue esta vez. Pierdes ${bet.toLocaleString("es-ES")} monedas.`;
-      saveState();
+      addToPot(bet);
       showToast(`${player.name} pierde ${bet.toLocaleString("es-ES")} monedas en la ruleta.`);
       showScreen("inicio");
       homeActions.render();

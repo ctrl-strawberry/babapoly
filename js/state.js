@@ -7,7 +7,8 @@ export const createDefaultState = () => ({
     { id: crypto.randomUUID(), name: "Rosi", money: 800, pet: { level: 1, xp: 0 } },
     { id: crypto.randomUUID(), name: "Nico", money: 650, pet: { level: 1, xp: 0 } },
     { id: crypto.randomUUID(), name: "Pilar", money: 900, pet: { level: 2, xp: 0.5 } }
-  ]
+  ],
+  pot: 0
 });
 
 export const loadState = () => {
@@ -18,7 +19,12 @@ export const loadState = () => {
     }
     const parsed = JSON.parse(stored);
     if (Array.isArray(parsed.players)) {
-      return parsed;
+      return {
+        ...parsed,
+        pot: typeof parsed.pot === "number" && Number.isFinite(parsed.pot) && parsed.pot >= 0
+          ? parsed.pot
+          : 0,
+      };
     }
   } catch (error) {
     console.warn("No se pudo cargar el estado guardado:", error);
@@ -64,3 +70,13 @@ export const formatPlayersForSelect = () =>
     id: player.id,
     label: `${player.name} · ${formatMoney(player.money)}`,
   }));
+
+export const addToPot = (amount) => {
+  if (!Number.isFinite(amount) || amount <= 0) return state.pot;
+  if (typeof state.pot !== "number" || !Number.isFinite(state.pot)) {
+    state.pot = 0;
+  }
+  state.pot += amount;
+  saveState();
+  return state.pot;
+};

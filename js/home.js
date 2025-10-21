@@ -8,6 +8,10 @@ import {
 import { formatMoney } from "./utils.js";
 
 const TRANSFER_DEFAULT = 50;
+const BANK_PLAYER_ID = "bank";
+const BANK_PLAYER_NAME = "Banca";
+const POT_PLAYER_ID = "pot";
+const POT_PLAYER_NAME = "Bote";
 
 export const initHome = ({
   playerList,
@@ -23,6 +27,27 @@ export const initHome = ({
   let activeModal = null;
 
   addPlayerBtn.hidden = true;
+
+  const isBank = (playerId) => playerId === BANK_PLAYER_ID;
+  const isPot = (playerId) => playerId === POT_PLAYER_ID;
+
+  const getParticipantById = (playerId) => {
+    if (isBank(playerId)) {
+      return {
+        id: BANK_PLAYER_ID,
+        name: BANK_PLAYER_NAME,
+        money: Number.POSITIVE_INFINITY,
+      };
+    }
+    if (isPot(playerId)) {
+      return {
+        id: POT_PLAYER_ID,
+        name: POT_PLAYER_NAME,
+        money: state.pot ?? 0,
+      };
+    }
+    return getPlayerById(playerId);
+  };
 
   const clearTransferSelection = () => {
     transferState.from = null;
@@ -44,6 +69,8 @@ export const initHome = ({
 
   const showMoneyAnimation = (playerId, amount) => {
     if (!amount) return;
+    if (isBank(playerId) || isPot(playerId)) return;
+
     const targetCard = playerList.querySelector(
       `[data-player-id="${playerId}"]`,
     );
@@ -109,11 +136,22 @@ export const initHome = ({
   };
 
   const launchTransferModal = (fromId, toId) => {
-    const sourcePlayer = getPlayerById(fromId);
-    const targetPlayer = getPlayerById(toId);
+    if (isPot(fromId) || isPot(toId)) return;
+
+    const sourcePlayer = getParticipantById(fromId);
+    const targetPlayer = getParticipantById(toId);
     if (!sourcePlayer || !targetPlayer) return;
 
     closeModal();
+
+    const sourceMax = Number.isFinite(sourcePlayer.money)
+      ? sourcePlayer.money
+      : null;
+    const initialAmount = sourceMax !== null
+      ? Math.min(TRANSFER_DEFAULT, sourceMax || 1)
+      : TRANSFER_DEFAULT;
+    const maxAttribute =
+      sourceMax !== null ? `max="${sourceMax}"` : "";
 
     const modal = document.createElement("div");
     modal.className = "modal-backdrop";
@@ -125,7 +163,7 @@ export const initHome = ({
         </p>
         <form>
           <label for="transferAmount">Cantidad</label>
-          <input id="transferAmount" type="number" min="1" max="${sourcePlayer.money}" value="${TRANSFER_DEFAULT}" required>
+          <input id="transferAmount" type="number" min="1" ${maxAttribute} value="${initialAmount}" required>
           <div class="modal-actions">
             <button class="btn btn-ghost" type="button" data-action="cancel">Cancelar</button>
             <button class="btn btn-primary" type="submit">Transferir</button>
@@ -141,20 +179,31 @@ export const initHome = ({
       event.preventDefault();
       const amount = Number(amountInput.value);
       if (!Number.isFinite(amount) || amount <= 0) return;
-      if (amount > sourcePlayer.money) {
+      if (Number.isFinite(sourceMax) && amount > sourceMax) {
         amountInput.setCustomValidity("No hay suficientes monedas");
         amountInput.reportValidity();
         return;
       }
 
-      sourcePlayer.money -= amount;
-      targetPlayer.money += amount;
-      saveState();
+      if (!isBank(fromId)) {
+        sourcePlayer.money -= amount;
+      }
+      if (!isBank(toId)) {
+        targetPlayer.money += amount;
+      }
+
+      if (!isBank(fromId) || !isBank(toId)) {
+        saveState();
+      }
 
       closeModal();
       renderPlayers();
-      showMoneyAnimation(fromId, -amount);
-      showMoneyAnimation(toId, amount);
+      if (!isBank(fromId)) {
+        showMoneyAnimation(fromId, -amount);
+      }
+      if (!isBank(toId)) {
+        showMoneyAnimation(toId, amount);
+      }
     });
 
     modal
@@ -246,6 +295,11 @@ export const initHome = ({
   };
 
   const handlePlayerClick = (node, playerId) => {
+    if (isPot(playerId)) {
+      clearTransferSelection();
+      return;
+    }
+
     if (editingMode) {
       return;
     }
@@ -268,6 +322,34 @@ export const initHome = ({
 
   const renderPlayers = () => {
     playerList.innerHTML = "";
+
+    const bankCard = playerCardTemplate.content.firstElementChild.cloneNode(true);
+    bankCard.dataset.playerId = BANK_PLAYER_ID;
+    bankCard.classList.add("bank-card");
+    bankCard.querySelector(".player-name").textContent = BANK_PLAYER_NAME;
+    const bankMoneyNode = bankCard.querySelector(".player-money");
+    if (bankMoneyNode) {
+      bankMoneyNode.textContent = "";
+    }
+    const bankActions = bankCard.querySelector(".player-actions");
+    bankActions?.remove();
+    bankCard.addEventListener("click", () => handlePlayerClick(bankCard, BANK_PLAYER_ID));
+    playerList.appendChild(bankCard);
+
+    const potCard = playerCardTemplate.content.firstElementChild.cloneNode(true);
+    potCard.dataset.playerId = POT_PLAYER_ID;
+    potCard.classList.add("pot-card");
+    potCard.querySelector(".player-name").textContent = POT_PLAYER_NAME;
+    const potMoneyNode = potCard.querySelector(".player-money");
+    if (potMoneyNode) {
+      potMoneyNode.textContent = formatMoney(state.pot ?? 0);
+    }
+    const potActions = potCard.querySelector(".player-actions");
+    potActions?.remove();
+    potCard.disabled = true;
+    potCard.classList.add("is-static");
+    playerList.appendChild(potCard);
+
     state.players.forEach((player) => {
       const card = playerCardTemplate.content.firstElementChild.cloneNode(true);
       card.dataset.playerId = player.id;

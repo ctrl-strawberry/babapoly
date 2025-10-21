@@ -1,4 +1,4 @@
-import { saveState, getPlayerById } from "./state.js";
+import { saveState, getPlayerById, addToPot } from "./state.js";
 import { randomBetween } from "./utils.js";
 
 const ATTACKS = [
@@ -174,7 +174,7 @@ export const initJimbo = ({
       appendLog(`${player.name} pierde la batalla.`);
       const penalty = Math.min(player.money, 70 + player.pet.level * 30);
       player.money -= penalty;
-      saveState();
+      addToPot(penalty);
       setTimeout(() => {
         showToast(`${player.name} pierde ${penalty.toLocaleString("es-ES")} monedas en Jimbo.`);
         showScreen("inicio");
