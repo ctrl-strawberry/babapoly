@@ -18,8 +18,8 @@
   position: relative;
   display: flex;
   gap: 0.4rem;
-  background: #fff;
-  box-shadow: 0 0 1px 0 rgba(24, 94, 224, 0.15), 0 6px 12px 0 rgba(24, 94, 224, 0.18);
+  background: var(--nav-bg);
+  box-shadow: var(--nav-shadow);
   padding: 0.55rem 0.65rem;
   border-radius: 999px;
 }
@@ -35,7 +35,7 @@
   width: 58px;
   height: 58px;
   border-radius: 50%;
-  color: #5b6075;
+  color: var(--nav-tab);
   cursor: pointer;
   transition: color 0.2s ease;
   position: relative;
@@ -49,7 +49,7 @@
 }
 
 .bottom-tabs input[type="radio"]:checked + .tab {
-  color: #1d4ed8;
+  color: var(--nav-tab-active);
 }
 
 .bottom-tabs .glider {
@@ -58,7 +58,7 @@
   left: 0.65rem;
   width: 58px;
   height: 58px;
-  background: rgba(230, 238, 249, 0.95);
+  background: var(--nav-glider);
   border-radius: 50%;
   transition: transform 0.25s ease-out;
   z-index: 1;

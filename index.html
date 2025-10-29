@@ -14,6 +14,9 @@
 <body>
   <div class="app-shell">
     <header id="homeHeader">
+      <button class="btn btn-ghost image-lab-launcher" type="button" id="openImageLabBtn" aria-label="Abrir laboratorio de imágenes">
+        Laboratorio IA
+      </button>
       <button class="settings-terminal-btn" id="settingsToggle" aria-pressed="false" aria-label="Activar modo ajustes">
         <span class="terminal-title">BABAPOLY</span><span class="terminal-cursor" aria-hidden="true">_</span>
       </button>
@@ -70,6 +73,96 @@
         </div>
       </section>
 
+      <section id="screen-image-lab" aria-labelledby="imageLabTitle">
+        <div class="image-lab">
+          <div class="image-lab-top">
+            <button class="btn btn-ghost" type="button" id="imageLabBackBtn" aria-label="Volver a Inicio">
+              ← Volver a Inicio
+            </button>
+            <span class="image-lab-status" id="imageLabStatus"></span>
+          </div>
+          <h2 id="imageLabTitle" class="section-title">Laboratorio de imágenes</h2>
+          <p class="helper-text image-lab-description">
+            Prueba llamadas a tu backend y a la API de Google para depurar la generación de avatares. Esta herramienta sólo se sirve en local; no expongas la clave públicamente.
+          </p>
+          <div class="image-lab-grid">
+            <form id="imageLabForm" class="image-lab-panel" autocomplete="off">
+              <fieldset>
+                <legend>Entrada</legend>
+                <label for="imageLabFile" class="image-lab-label">Imagen base</label>
+                <input type="file" id="imageLabFile" accept="image/*">
+                <div class="image-lab-actions">
+                  <button class="btn btn-ghost" type="button" id="imageLabSampleBtn">Usar mascota de ejemplo</button>
+                  <button class="btn btn-ghost" type="button" id="imageLabClearBtn">Limpiar</button>
+                </div>
+
+                <figure class="image-lab-preview">
+                  <img id="imageLabSourcePreview" alt="Vista previa de la imagen base" loading="lazy">
+                  <figcaption id="imageLabSourceInfo" class="helper-text">Carga una imagen para comenzar.</figcaption>
+                </figure>
+
+                <label for="imageLabPrompt" class="image-lab-label">Prompt</label>
+                <textarea id="imageLabPrompt" rows="3" spellcheck="false"></textarea>
+
+                <div class="image-lab-inline">
+                  <div>
+                    <label for="imageLabModel" class="image-lab-label">Modelo</label>
+                    <input type="text" id="imageLabModel" value="gemini-2.5-flash-image">
+                  </div>
+                  <div>
+                    <label for="imageLabMode" class="image-lab-label">Modo</label>
+                    <select id="imageLabMode">
+                      <option value="edit">Editar imagen subida</option>
+                      <option value="generate">Generar desde prompt</option>
+                    </select>
+                  </div>
+                </div>
+
+                <label for="imageLabEndpoint" class="image-lab-label">Endpoint del backend</label>
+                <input type="url" id="imageLabEndpoint" placeholder="/api/edit-avatar">
+
+                <label for="imageLabAdvancedJson" class="image-lab-label">Campos extra (JSON opcional)</label>
+                <textarea id="imageLabAdvancedJson" rows="4" spellcheck="false" placeholder='{"editConfig":{"referenceSubjectStrength":0.4}}'></textarea>
+                <span class="helper-text">Se fusiona con el cuerpo enviado al backend y a Google.</span>
+
+                <label class="image-lab-checkbox">
+                  <input type="checkbox" id="imageLabIncludeRaw">
+                  Incluir respuesta cruda de Google en la salida del backend
+                </label>
+
+                <div class="image-lab-actions">
+                  <button class="btn btn-primary" type="button" id="imageLabBackendBtn">Probar backend</button>
+                </div>
+
+                <details class="image-lab-direct">
+                  <summary>Prueba directa con la API de Google (uso local)</summary>
+                  <label for="imageLabApiKey" class="image-lab-label">Clave de Google</label>
+                  <input type="password" id="imageLabApiKey" autocomplete="off" placeholder="AIza...">
+                  <span class="helper-text">La clave sólo se usa desde tu navegador. No la compartas.</span>
+                  <button class="btn btn-ghost" type="button" id="imageLabDirectBtn">Llamar a Google directamente</button>
+                </details>
+              </fieldset>
+            </form>
+
+            <div class="image-lab-panel image-lab-results">
+              <h3>Resultados</h3>
+              <div class="image-lab-preview-grid">
+                <figure class="image-lab-preview">
+                  <img id="imageLabResultPreview" alt="Resultado de la llamada" loading="lazy">
+                  <figcaption id="imageLabResultInfo" class="helper-text">Aún no hay resultados.</figcaption>
+                </figure>
+              </div>
+
+              <label for="imageLabRequestPreview" class="image-lab-label">Payloads preparados</label>
+              <textarea id="imageLabRequestPreview" rows="10" readonly spellcheck="false"></textarea>
+
+              <label for="imageLabResponsePreview" class="image-lab-label">Respuesta recibida</label>
+              <textarea id="imageLabResponsePreview" rows="12" readonly spellcheck="false"></textarea>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section id="screen-ruleta">
         <h2 class="section-title">Ruleta Baba</h2>
         <p class="helper-text">
@@ -104,7 +197,14 @@
         </div>
         <div class="player-actions">
           <img class="player-avatar" alt="">
-          <button class="player-delete-btn" data-action="delete" title="Eliminar jugador" aria-label="Eliminar jugador">&times;</button>
+          <span
+            class="player-delete-btn"
+            role="button"
+            data-action="delete"
+            title="Eliminar jugador"
+            aria-label="Eliminar jugador"
+            tabindex="-1"
+          >&times;</span>
         </div>
       </div>
     </button>

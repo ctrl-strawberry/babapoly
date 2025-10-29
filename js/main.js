@@ -2,11 +2,13 @@ import { state } from "./state.js";
 import { initHome } from "./home.js";
 import { initJimbo } from "./jimbo.js";
 import { initRoulette } from "./roulette.js";
+import { initImageLab } from "./image-lab.js";
 
 const screens = {
   inicio: document.getElementById("screen-inicio"),
   jimbo: document.getElementById("screen-jimbo"),
   ruleta: document.getElementById("screen-ruleta"),
+  lab: document.getElementById("screen-image-lab"),
 };
 
 const bottomNavRadios = Array.from(
@@ -14,6 +16,7 @@ const bottomNavRadios = Array.from(
 );
 const homeHeader = document.getElementById("homeHeader");
 const settingsToggle = document.getElementById("settingsToggle");
+const openImageLabBtn = document.getElementById("openImageLabBtn");
 const playerToolbar = document.getElementById("playerToolbar");
 const addPlayerBtn = document.getElementById("addPlayerBtn");
 const playerList = document.getElementById("playerList");
@@ -54,6 +57,7 @@ const showToast = (message) => {
 
 let jimboApi = null;
 let rouletteApi = null;
+let imageLabApi = null;
 
 const home = initHome({
   playerList,
@@ -107,6 +111,12 @@ rouletteApi = initRoulette({
   },
 });
 
+imageLabApi = initImageLab({
+  section: screens.lab,
+  openButton: openImageLabBtn,
+  showScreen: (screenId) => showScreen(screenId),
+});
+
 let currentScreen = "inicio";
 
 const showScreen = (screenId) => {
@@ -135,6 +145,8 @@ const showScreen = (screenId) => {
     jimboApi.enterJimbo();
   } else if (screenId === "ruleta") {
     rouletteApi.resetWheel();
+  } else if (screenId === "lab") {
+    imageLabApi.onEnter();
   }
 };
 

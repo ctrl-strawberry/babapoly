@@ -5,7 +5,7 @@ import {
   addPlayer,
   deletePlayer,
 } from "./state.js";
-import { formatMoney } from "./utils.js";
+import { formatMoney, readFileAsBase64, toDataUrl } from "./utils.js";
 
 const BANK_PLAYER_ID = "bank";
 const BANK_PLAYER_NAME = "Banca";
@@ -16,25 +16,6 @@ const AVATAR_EDIT_ENDPOINT =
   typeof window !== "undefined" && window.BABA_POLY_AVATAR_ENDPOINT
     ? window.BABA_POLY_AVATAR_ENDPOINT
     : "/api/edit-avatar";
-
-const readFileAsBase64 = (file) =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = reader.result;
-      if (typeof result === "string") {
-        const [, base64] = result.split(",");
-        resolve(base64 || "");
-      } else {
-        resolve("");
-      }
-    };
-    reader.onerror = () => reject(reader.error);
-    reader.readAsDataURL(file);
-  });
-
-const toDataUrl = (base64, mimeType = "image/png") =>
-  `data:${mimeType};base64,${base64}`;
 
 const requestAvatarFromBackend = async (file) => {
   const base64Source = await readFileAsBase64(file);
@@ -56,7 +37,7 @@ const requestAvatarFromBackend = async (file) => {
       },
       body: JSON.stringify({
         image: base64Source,
-        mimeType: file.type || "image/png",
+        mimeType: "image/png",
       }),
     });
 
@@ -560,12 +541,18 @@ export const initHome = ({
       card.classList.toggle("show-actions", editingMode);
 
       if (deleteButton) {
-        deleteButton.hidden = !editingMode;
         deleteButton.tabIndex = editingMode ? 0 : -1;
         deleteButton.setAttribute("aria-hidden", editingMode ? "false" : "true");
-        deleteButton.addEventListener("click", (event) => {
+        const handleDelete = (event) => {
           event.stopPropagation();
           openDeleteConfirmModal(player.id);
+        };
+        deleteButton.addEventListener("click", handleDelete);
+        deleteButton.addEventListener("keydown", (event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            handleDelete(event);
+          }
         });
       }
 
