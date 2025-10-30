@@ -4,6 +4,7 @@ import {
   getPlayerById,
   addPlayer,
   deletePlayer,
+  DEFAULT_PLAYER_COLOR,
 } from "./state.js";
 import { formatMoney, readFileAsBase64, toDataUrl } from "./utils.js";
 
@@ -12,14 +13,89 @@ const BANK_PLAYER_NAME = "Banca";
 const POT_PLAYER_ID = "pot";
 const POT_PLAYER_NAME = "Bote";
 
+const prefersDarkScheme =
+  typeof window !== "undefined" && window.matchMedia
+    ? window.matchMedia("(prefers-color-scheme: dark)")
+    : null;
+
+const COLOR_PRESETS = [
+  { label: "Negro", value: DEFAULT_PLAYER_COLOR },
+  { label: "Neón Violeta", value: "#7f5af0" },
+  { label: "Cian Plasma", value: "#00b7ff" },
+  { label: "Verde Ácido", value: "#2ce598" },
+  { label: "Magenta Pulsar", value: "#ff2d88" },
+];
+
+const HEX_COLOR_REGEX = /^#([0-9a-f]{6})$/i;
+
+const sanitizeHexColor = (value) => {
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    if (HEX_COLOR_REGEX.test(trimmed)) {
+      return trimmed.toLowerCase();
+    }
+  }
+  return DEFAULT_PLAYER_COLOR;
+};
+
+const rgbToHex = (r, g, b) =>
+  `#${[r, g, b]
+    .map((component) =>
+      Math.round(Math.min(255, Math.max(0, component)))
+        .toString(16)
+        .padStart(2, "0"),
+    )
+    .join("")}`;
+
+const hexToRgb = (hex) => {
+  const normalized = sanitizeHexColor(hex).slice(1);
+  return {
+    r: parseInt(normalized.slice(0, 2), 16),
+    g: parseInt(normalized.slice(2, 4), 16),
+    b: parseInt(normalized.slice(4, 6), 16),
+  };
+};
+
+const mixHexColors = (sourceHex, targetHex, ratio) => {
+  const safeRatio = Math.min(Math.max(Number(ratio) || 0, 0), 1);
+  const source = hexToRgb(sourceHex);
+  const target = hexToRgb(targetHex);
+  const mixComponent = (a, b) => a + (b - a) * safeRatio;
+  return rgbToHex(
+    mixComponent(source.r, target.r),
+    mixComponent(source.g, target.g),
+    mixComponent(source.b, target.b),
+  );
+};
+
+const adjustColorForScheme = (hex, isDark) => {
+  const sanitized = sanitizeHexColor(hex);
+  return isDark
+    ? mixHexColors(sanitized, "#ffffff", 0.6)
+    : mixHexColors(sanitized, "#000000", 0.4);
+};
+
+const getSchemeAdjustedNameColor = (hex) =>
+  adjustColorForScheme(hex, prefersDarkScheme?.matches ?? false);
+
+const applyNameAccent = (element, color) => {
+  if (!element) return;
+  element.style.color = getSchemeAdjustedNameColor(color);
+};
+
 const AVATAR_EDIT_ENDPOINT =
   typeof window !== "undefined" && window.BABA_POLY_AVATAR_ENDPOINT
     ? window.BABA_POLY_AVATAR_ENDPOINT
     : "/api/edit-avatar";
 
-const requestAvatarFromBackend = async (file) => {
+const requestAvatarFromBackend = async (
+  file,
+  { colorHex = DEFAULT_PLAYER_COLOR } = {},
+) => {
   const base64Source = await readFileAsBase64(file);
   const fallback = toDataUrl(base64Source, file.type || "image/png");
+  const backgroundColor = sanitizeHexColor(colorHex);
+  const prompt = `crea una imagen de mi busto, añademe monoculo, sombrero de copa y un gran bigote blanco clasico. añade un fondo del color ${backgroundColor} con estilo ciberpunk e iluminación cinematográfica, con luces de neón y volumen dramático. la composición debe asemejarse a una foto tipo dni, busto centrado y mirada al frente.`;
 
   if (!base64Source) {
     return fallback;
@@ -38,6 +114,8 @@ const requestAvatarFromBackend = async (file) => {
       body: JSON.stringify({
         image: base64Source,
         mimeType: "image/png",
+        prompt,
+        colorHex: backgroundColor,
       }),
     });
 
@@ -310,10 +388,15 @@ export const initHome = ({
               <input id="newPlayerMoneyRange" type="range" min="100" max="2000" step="50" value="500">
               <input id="newPlayerMoneyValue" type="number" min="100" max="2000" step="50" value="500">
             </div>
+            <div class="color-picker">
+              <span class="color-picker-label">Color del fondo</span>
+              <div class="color-picker-options" id="newPlayerColorOptions"></div>
+              <p class="helper-text color-picker-helper">Se aplicará al fondo ciberpunk del retrato.</p>
+            </div>
             <label for="newPlayerPhoto">Foto</label>
             <input id="newPlayerPhoto" type="file" accept="image/*" capture="environment" required>
             <p class="helper-text add-player-helper">
-              La imagen se enviará a la IA para aplicar el estilo clásico con monóculo, sombrero y bigote.
+              La imagen se enviará a la IA para aplicar el estilo clásico con monóculo, sombrero, bigote y un fondo iluminado con el color elegido.
             </p>
             <div class="modal-actions">
               <button class="btn btn-ghost" type="button" data-action="cancel">Cancelar</button>
@@ -334,6 +417,165 @@ export const initHome = ({
     const cancelButton = form.querySelector("[data-action='cancel']");
     const statusLabel = modal.querySelector(".add-player-status");
     const existingList = modal.querySelector("#existingPlayerList");
+    const colorOptionsContainer = form.querySelector("#newPlayerColorOptions");
+
+    const colorButtonMap = new Map();
+    let selectedColorHex = DEFAULT_PLAYER_COLOR;
+    let customOption;
+    let customColorInput;
+    let customSwatch;
+    let customHelperLabel;
+
+    const selectColor = (color, element) => {
+      const sanitized = sanitizeHexColor(color);
+      selectedColorHex = sanitized;
+
+      colorOptionsContainer
+        ?.querySelectorAll(".color-option")
+        .forEach((option) => {
+          option.classList.remove("is-selected");
+          option.setAttribute("aria-pressed", "false");
+        });
+
+      const target =
+        element ??
+        colorButtonMap.get(sanitized) ??
+        customOption ??
+        null;
+
+      if (target) {
+        target.classList.add("is-selected");
+        target.setAttribute("aria-pressed", "true");
+      }
+
+      if (target === customOption && customColorInput) {
+        if (customColorInput.value.toLowerCase() !== sanitized) {
+          customColorInput.value = sanitized;
+        }
+        customSwatch?.style.setProperty("--swatch-color", sanitized);
+        customHelperLabel && (customHelperLabel.textContent = sanitized.toUpperCase());
+      } else if (customColorInput) {
+        customSwatch?.style.setProperty("--swatch-color", customColorInput.value);
+        customHelperLabel &&
+          (customHelperLabel.textContent = customColorInput.value.toUpperCase());
+      }
+    };
+
+    const createColorOption = ({ label, value }) => {
+      const sanitized = sanitizeHexColor(value);
+      const option = document.createElement("div");
+      option.className = "color-option";
+      option.tabIndex = 0;
+      option.setAttribute("role", "button");
+      option.setAttribute("aria-pressed", "false");
+      option.dataset.color = sanitized;
+
+      const swatch = document.createElement("span");
+      swatch.className = "color-option-swatch";
+      swatch.style.setProperty("--swatch-color", sanitized);
+
+      const name = document.createElement("span");
+      name.className = "color-option-name";
+      name.textContent = label;
+
+      const helper = document.createElement("span");
+      helper.className = "color-option-helper";
+      helper.textContent = sanitized.toUpperCase();
+
+      option.append(swatch, name, helper);
+
+      option.addEventListener("click", (event) => {
+        event.preventDefault();
+        selectColor(sanitized, option);
+      });
+
+      option.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          selectColor(sanitized, option);
+        }
+      });
+
+      colorButtonMap.set(sanitized, option);
+      return option;
+    };
+
+    const createCustomOption = () => {
+      const option = document.createElement("div");
+      option.className = "color-option color-option-custom";
+      option.setAttribute("role", "button");
+      option.setAttribute("aria-pressed", "false");
+      option.tabIndex = 0;
+
+      const swatch = document.createElement("span");
+      swatch.className = "color-option-swatch";
+      swatch.style.setProperty("--swatch-color", DEFAULT_PLAYER_COLOR);
+
+      const name = document.createElement("span");
+      name.className = "color-option-name";
+      name.textContent = "Personalizar";
+
+      const helper = document.createElement("span");
+      helper.className = "color-option-helper";
+      helper.textContent = DEFAULT_PLAYER_COLOR.toUpperCase();
+
+      const colorInput = document.createElement("input");
+      colorInput.type = "color";
+      colorInput.value = DEFAULT_PLAYER_COLOR;
+      colorInput.id = "newPlayerCustomColor";
+      colorInput.className = "color-option-color-input";
+      colorInput.setAttribute("aria-label", "Elige un color personalizado");
+      colorInput.tabIndex = -1;
+
+      option.append(swatch, name, helper, colorInput);
+
+      const openPicker = () => {
+        selectColor(colorInput.value, option);
+        colorInput.click();
+      };
+
+      option.addEventListener("click", (event) => {
+        if (event.target === colorInput) {
+          return;
+        }
+        event.preventDefault();
+        openPicker();
+      });
+
+      option.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          openPicker();
+        }
+      });
+
+      const handleCustomChange = () => {
+        selectColor(colorInput.value, option);
+      };
+
+      colorInput.addEventListener("input", handleCustomChange);
+      colorInput.addEventListener("change", handleCustomChange);
+
+      colorInput.addEventListener("click", (event) => {
+        event.stopPropagation();
+        selectColor(colorInput.value, option);
+      });
+
+      customColorInput = colorInput;
+      customHelperLabel = helper;
+      customSwatch = swatch;
+      return option;
+    };
+
+    if (colorOptionsContainer) {
+      COLOR_PRESETS.forEach((preset) => {
+        const option = createColorOption(preset);
+        colorOptionsContainer.appendChild(option);
+      });
+      customOption = createCustomOption();
+      colorOptionsContainer.appendChild(customOption);
+      selectColor(DEFAULT_PLAYER_COLOR, colorButtonMap.get(DEFAULT_PLAYER_COLOR));
+    }
 
     const clampMoney = (value) => {
       const min = Number(rangeInput.min);
@@ -366,6 +608,9 @@ export const initHome = ({
           <span class="existing-player-name">${player.name}</span>
           <span class="existing-player-money">${formatMoney(player.money)}</span>
         `;
+        const playerColor = sanitizeHexColor(player.colorHex);
+        const nameNode = item.querySelector(".existing-player-name");
+        applyNameAccent(nameNode, playerColor);
         if (player.avatar) {
           const avatarPreview = document.createElement("img");
           avatarPreview.src = player.avatar;
@@ -378,6 +623,7 @@ export const initHome = ({
         item.addEventListener("click", () => {
           nameInput.value = player.name;
           syncMoneyInputs(player.money);
+          selectColor(playerColor);
           nameInput.focus();
         });
         existingList.appendChild(item);
@@ -415,13 +661,15 @@ export const initHome = ({
       statusLabel.textContent = "Generando imagen con la IA...";
 
       try {
-        const avatarDataUrl = await requestAvatarFromBackend(photoFile);
+        const colorHex = sanitizeHexColor(selectedColorHex);
+        const avatarDataUrl = await requestAvatarFromBackend(photoFile, { colorHex });
         addPlayer({
           id: crypto.randomUUID(),
           name,
           money,
           pet: { level: 1, xp: 0 },
           avatar: avatarDataUrl,
+          colorHex,
         });
         closeModal();
         renderPlayers();
@@ -509,10 +757,13 @@ export const initHome = ({
     state.players.forEach((player) => {
       const card = playerCardTemplate.content.firstElementChild.cloneNode(true);
       card.dataset.playerId = player.id;
+      const playerColor = sanitizeHexColor(player.colorHex);
+      card.style.setProperty("--player-accent", playerColor);
 
       const nameNode = card.querySelector(".player-name");
       if (nameNode) {
         nameNode.textContent = player.name;
+        applyNameAccent(nameNode, playerColor);
       }
 
       const moneyNode = card.querySelector(".player-money");
@@ -562,6 +813,12 @@ export const initHome = ({
 
     onPlayersUpdated([...state.players]);
   };
+
+  if (prefersDarkScheme) {
+    prefersDarkScheme.addEventListener("change", () => {
+      renderPlayers();
+    });
+  }
 
   const toggleEditing = () => {
     editingMode = !editingMode;

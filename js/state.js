@@ -1,14 +1,42 @@
 import { formatMoney } from "./utils.js";
 
 export const STORAGE_KEY = "baba-poly-state-v1";
+export const DEFAULT_PLAYER_COLOR = "#000000";
+
+const HEX_COLOR_REGEX = /^#([0-9a-f]{6})$/i;
+const sanitizePlayerColor = (value) =>
+  typeof value === "string" && HEX_COLOR_REGEX.test(value.trim())
+    ? value.trim().toLowerCase()
+    : DEFAULT_PLAYER_COLOR;
 
 export const createDefaultState = () => ({
   players: [
-    { id: crypto.randomUUID(), name: "Rosi", money: 800, pet: { level: 1, xp: 0 }, avatar: null },
-    { id: crypto.randomUUID(), name: "Nico", money: 650, pet: { level: 1, xp: 0 }, avatar: null },
-    { id: crypto.randomUUID(), name: "Pilar", money: 900, pet: { level: 2, xp: 0.5 }, avatar: null }
+    {
+      id: crypto.randomUUID(),
+      name: "Rosi",
+      money: 800,
+      pet: { level: 1, xp: 0 },
+      avatar: null,
+      colorHex: DEFAULT_PLAYER_COLOR,
+    },
+    {
+      id: crypto.randomUUID(),
+      name: "Nico",
+      money: 650,
+      pet: { level: 1, xp: 0 },
+      avatar: null,
+      colorHex: DEFAULT_PLAYER_COLOR,
+    },
+    {
+      id: crypto.randomUUID(),
+      name: "Pilar",
+      money: 900,
+      pet: { level: 2, xp: 0.5 },
+      avatar: null,
+      colorHex: DEFAULT_PLAYER_COLOR,
+    },
   ],
-  pot: 0
+  pot: 0,
 });
 
 export const loadState = () => {
@@ -22,6 +50,7 @@ export const loadState = () => {
       const normalizedPlayers = parsed.players.map((player) => ({
         ...player,
         avatar: typeof player?.avatar === "string" ? player.avatar : null,
+        colorHex: sanitizePlayerColor(player?.colorHex),
       }));
       return {
         ...parsed,
@@ -50,7 +79,11 @@ export const saveState = () => {
 export const getPlayerById = (id) => state.players.find((player) => player.id === id);
 
 export const addPlayer = (player) => {
-  state.players.push(player);
+  const sanitized = {
+    ...player,
+    colorHex: sanitizePlayerColor(player?.colorHex),
+  };
+  state.players.push(sanitized);
   saveState();
 };
 
