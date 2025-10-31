@@ -95,7 +95,7 @@ const requestAvatarFromBackend = async (
   const base64Source = await readFileAsBase64(file);
   const fallback = toDataUrl(base64Source, file.type || "image/png");
   const backgroundColor = sanitizeHexColor(colorHex);
-  const prompt = `crea una imagen de mi busto, añademe monoculo, sombrero de copa y un gran bigote blanco clasico. añade un fondo del color ${backgroundColor} con estilo ciberpunk e iluminación cinematográfica, con luces de neón y volumen dramático. la composición debe asemejarse a una foto tipo dni, busto centrado y mirada al frente.`;
+  const prompt = `crea una imagen de mi cara, añademe monoculo, un mini bombin y un gran bigote blanco clasico. que solo se vea la cara en primer plano. añade un fondo del color ${backgroundColor} con estilo ciberpunk e iluminación cinematográfica, con luces de neón y volumen dramático. la composición debe asemejarse a una foto tipo dni, rostro centrado y mirada al frente.`;
 
   if (!base64Source) {
     return fallback;
@@ -142,6 +142,7 @@ export const initHome = ({
   settingsToggle,
   playerCardTemplate,
   modalContainer,
+  bottomNav,
   onPlayersUpdated = () => {},
 }) => {
   const transferState = { from: null, to: null };
@@ -149,6 +150,12 @@ export const initHome = ({
   let activeModal = null;
 
   addPlayerBtn.hidden = true;
+
+  const setBottomNavHidden = (hidden) => {
+    if (!bottomNav) return;
+    bottomNav.classList.toggle("is-hidden", hidden);
+    bottomNav.setAttribute("aria-hidden", hidden ? "true" : "false");
+  };
 
   const isBank = (playerId) => playerId === BANK_PLAYER_ID;
   const isPot = (playerId) => playerId === POT_PLAYER_ID;
@@ -184,6 +191,7 @@ export const initHome = ({
       activeModal.remove();
       activeModal = null;
       clearTransferSelection();
+      setBottomNavHidden(false);
       return true;
     }
     return false;
@@ -253,12 +261,12 @@ export const initHome = ({
       }
     });
 
+    const cancelButtonNode = modal.querySelector("[data-action='cancel']");
     modalContainer.appendChild(modal);
     activeModal = modal;
+    setBottomNavHidden(true);
     requestAnimationFrame(() => {
-      amountInput.focus({ preventScroll: true });
-      amountInput.select();
-      amountInput.scrollIntoView({ block: "center" });
+      cancelButtonNode?.focus({ preventScroll: true });
     });
   };
 
@@ -354,6 +362,7 @@ export const initHome = ({
 
     modalContainer.appendChild(modal);
     activeModal = modal;
+    setBottomNavHidden(true);
     requestAnimationFrame(() => {
       amountInput.focus({ preventScroll: true });
       amountInput.select();
@@ -695,6 +704,7 @@ export const initHome = ({
 
     modalContainer.appendChild(modal);
     activeModal = modal;
+    setBottomNavHidden(true);
     nameInput.focus();
   };
 
@@ -735,8 +745,8 @@ export const initHome = ({
     if (bankMoneyNode) {
       bankMoneyNode.textContent = "";
     }
-    const bankActions = bankCard.querySelector(".player-actions");
-    bankActions?.remove();
+    bankCard.querySelector(".player-card-visual")?.remove();
+    bankCard.querySelector("[data-action='delete']")?.remove();
     bankCard.addEventListener("click", () => handlePlayerClick(bankCard, BANK_PLAYER_ID));
     playerList.appendChild(bankCard);
 
@@ -748,8 +758,8 @@ export const initHome = ({
     if (potMoneyNode) {
       potMoneyNode.textContent = formatMoney(state.pot ?? 0);
     }
-    const potActions = potCard.querySelector(".player-actions");
-    potActions?.remove();
+    potCard.querySelector(".player-card-visual")?.remove();
+    potCard.querySelector("[data-action='delete']")?.remove();
     potCard.disabled = true;
     potCard.classList.add("is-static");
     playerList.appendChild(potCard);
@@ -771,21 +781,36 @@ export const initHome = ({
         moneyNode.textContent = formatMoney(player.money);
       }
 
-      const actionArea = card.querySelector(".player-actions");
-      const deleteButton = actionArea?.querySelector("[data-action='delete']");
-      const avatarImg = actionArea?.querySelector(".player-avatar");
+      const visualArea = card.querySelector(".player-card-visual");
+      const avatarImg = visualArea?.querySelector(".player-avatar");
+      const avatarBlur = visualArea?.querySelector(".player-avatar-blur");
+      const deleteButton = card.querySelector("[data-action='delete']");
 
-      if (avatarImg) {
-        if (player.avatar) {
-          avatarImg.src = player.avatar;
-          avatarImg.alt = `Avatar de ${player.name}`;
-          avatarImg.loading = "lazy";
-          avatarImg.decoding = "async";
-          card.classList.add("has-avatar");
-        } else {
+      if (player.avatar && avatarImg) {
+        avatarImg.src = player.avatar;
+        avatarImg.alt = `Avatar de ${player.name}`;
+        avatarImg.loading = "lazy";
+        avatarImg.decoding = "async";
+        card.classList.add("has-avatar");
+        card.style.setProperty("--player-avatar-image", `url("${player.avatar}")`);
+        if (visualArea) {
+          visualArea.style.backgroundImage = `url("${player.avatar}")`;
+        }
+        if (avatarBlur) {
+          avatarBlur.style.backgroundImage = `url("${player.avatar}")`;
+        }
+      } else {
+        card.classList.remove("has-avatar");
+        card.style.removeProperty("--player-avatar-image");
+        if (visualArea) {
+          visualArea.style.backgroundImage = "none";
+        }
+        if (avatarImg) {
           avatarImg.removeAttribute("src");
           avatarImg.alt = "";
-          card.classList.remove("has-avatar");
+        }
+        if (avatarBlur) {
+          avatarBlur.style.backgroundImage = "none";
         }
       }
 

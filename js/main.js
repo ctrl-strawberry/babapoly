@@ -24,6 +24,7 @@ const playerCardTemplate = document.getElementById("playerCardTemplate");
 const playerSelectTemplate = document.getElementById("playerSelectCard");
 const modalContainer = document.getElementById("modalContainer");
 const toastLayer = document.getElementById("toastLayer");
+const bottomNav = document.querySelector(".bottom-nav");
 
 const jimboSelect = document.getElementById("jimboSelect");
 const battleStage = document.getElementById("battleStage");
@@ -66,6 +67,7 @@ const home = initHome({
   settingsToggle,
   playerCardTemplate,
   modalContainer,
+  bottomNav,
   onPlayersUpdated: (players) => {
     jimboApi?.renderPlayerSelector(players);
     rouletteApi?.renderPlayerOptions(players);

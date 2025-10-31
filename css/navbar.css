@@ -8,10 +8,20 @@
   pointer-events: none;
   z-index: 70;
   padding-inline: 1rem;
+  transition: opacity 0.25s ease, transform 0.25s ease;
 }
 
 .bottom-nav .tabs-container {
   pointer-events: auto;
+}
+
+.bottom-nav.is-hidden {
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+.bottom-nav.is-hidden .tabs-container {
+  pointer-events: none;
 }
 
 .bottom-tabs {

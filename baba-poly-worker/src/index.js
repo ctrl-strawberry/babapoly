@@ -1,5 +1,5 @@
 const IMAGE_EDIT_PROMPT =
-  "crea una imagen de mi busto, añademe monoculo, sombrero de copa y un gran bigote blanco clasico. añade un fondo negro con estilo ciberpunk e iluminación cinematográfica. la composición debe asemejarse a una foto tipo dni, busto centrado y mirada al frente.";
+  "crea una imagen de mi cara, añademe monoculo, un mini bombin y un gran bigote blanco clasico. que solo se vea la cara en primer plano. añade un fondo negro con estilo ciberpunk e iluminación cinematográfica. la composición debe asemejarse a una foto tipo dni, rostro centrado y mirada al frente.";
 const DEFAULT_MODEL = "gemini-2.5-flash-image";
 const GOOGLE_ENDPOINTS = {
   edit: "https://generativelanguage.googleapis.com/v1beta/models/imagegeneration:edit",
