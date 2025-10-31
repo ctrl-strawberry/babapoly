@@ -16,7 +16,6 @@ const bottomNavRadios = Array.from(
 );
 const homeHeader = document.getElementById("homeHeader");
 const settingsToggle = document.getElementById("settingsToggle");
-const openImageLabBtn = document.getElementById("openImageLabBtn");
 const playerToolbar = document.getElementById("playerToolbar");
 const addPlayerBtn = document.getElementById("addPlayerBtn");
 const playerList = document.getElementById("playerList");
@@ -47,6 +46,65 @@ const rouletteHelper = document.getElementById("rouletteHelper");
 const rouletteWheel = document.getElementById("rouletteWheel");
 const rouletteResult = document.getElementById("rouletteResult");
 const spinBtn = document.getElementById("spinBtn");
+
+const deriveBasePath = () => {
+  if (typeof window === "undefined") {
+    return "/";
+  }
+  const segments = window.location.pathname.split("/").filter(Boolean);
+  if (!segments.length) {
+    return "/";
+  }
+  const lastSegment = segments[segments.length - 1];
+  if (
+    lastSegment.includes(".") ||
+    Object.prototype.hasOwnProperty.call(screens, lastSegment)
+  ) {
+    segments.pop();
+  }
+  if (!segments.length) {
+    return "/";
+  }
+  return `/${segments.join("/")}/`;
+};
+
+const basePath = deriveBasePath();
+
+const normalizePathname = (pathname) => {
+  if (!pathname || pathname === "/") {
+    return "/";
+  }
+  return pathname.endsWith("/") && pathname.length > 1
+    ? pathname.slice(0, -1)
+    : pathname;
+};
+
+const getScreenFromLocation = () => {
+  if (typeof window === "undefined") {
+    return "inicio";
+  }
+  const normalized = normalizePathname(window.location.pathname);
+  if (normalized === "/") {
+    return "inicio";
+  }
+  const segments = normalized.split("/").filter(Boolean);
+  if (!segments.length) {
+    return "inicio";
+  }
+  const lastSegment = segments[segments.length - 1];
+  if (Object.prototype.hasOwnProperty.call(screens, lastSegment)) {
+    return lastSegment;
+  }
+  return "inicio";
+};
+
+const buildPathForScreen = (screenId) => {
+  const prefix = basePath === "/" ? "/" : basePath;
+  if (screenId === "inicio") {
+    return prefix;
+  }
+  return `${prefix}${screenId}`;
+};
 
 const showToast = (message) => {
   const toast = document.createElement("div");
@@ -115,13 +173,12 @@ rouletteApi = initRoulette({
 
 imageLabApi = initImageLab({
   section: screens.lab,
-  openButton: openImageLabBtn,
   showScreen: (screenId) => showScreen(screenId),
 });
 
 let currentScreen = "inicio";
 
-const showScreen = (screenId) => {
+const showScreen = (screenId, { skipHistory = false } = {}) => {
   if (!screens[screenId]) return;
   currentScreen = screenId;
 
@@ -143,6 +200,13 @@ const showScreen = (screenId) => {
     home.disableEditing();
   }
 
+  if (!skipHistory && typeof window !== "undefined") {
+    const targetPath = buildPathForScreen(screenId);
+    if (window.location.pathname !== targetPath) {
+      window.history.replaceState({ screenId }, "", targetPath);
+    }
+  }
+
   if (screenId === "jimbo") {
     jimboApi.enterJimbo();
   } else if (screenId === "ruleta") {
@@ -159,6 +223,20 @@ bottomNavRadios.forEach((radio) => {
     }
   });
 });
+
+const applyScreenFromLocation = () => {
+  const target = getScreenFromLocation();
+  if (target !== currentScreen) {
+    showScreen(target, { skipHistory: true });
+  } else if (target === "lab") {
+    imageLabApi.onEnter();
+  }
+};
+
+if (typeof window !== "undefined") {
+  window.addEventListener("popstate", applyScreenFromLocation);
+  applyScreenFromLocation();
+}
 
 document.addEventListener("keydown", (event) => {
   if (event.key !== "Escape") return;

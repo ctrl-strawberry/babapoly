@@ -24,6 +24,12 @@
   --nav-glider-dark: rgba(82, 96, 150, 0.32);
   --nav-shadow: 0 0 1px 0 rgba(24, 94, 224, 0.15), 0 6px 12px 0 rgba(24, 94, 224, 0.18);
   --nav-shadow-dark: 0 0 1px 0 rgba(12, 20, 52, 0.6), 0 10px 24px -18px rgba(6, 10, 28, 0.85);
+  --form-control-bg: rgba(255, 255, 255, 0.78);
+  --form-control-border: rgba(124, 130, 170, 0.3);
+  --form-control-text: var(--text);
+  --form-control-placeholder: rgba(88, 96, 127, 0.58);
+  --form-control-focus-border: rgba(127, 90, 240, 0.55);
+  --form-control-focus-ring: rgba(127, 90, 240, 0.18);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -39,6 +45,11 @@
     --nav-tab-active: var(--nav-tab-active-dark);
     --nav-glider: var(--nav-glider-dark);
     --nav-shadow: var(--nav-shadow-dark);
+    --form-control-bg: rgba(22, 26, 48, 0.9);
+    --form-control-border: rgba(140, 152, 218, 0.42);
+    --form-control-placeholder: rgba(194, 204, 248, 0.7);
+    --form-control-focus-border: rgba(129, 140, 234, 0.66);
+    --form-control-focus-ring: rgba(129, 140, 234, 0.24);
   }
 }
 
@@ -158,22 +169,6 @@ section.active {
   align-items: center;
   width: 100%;
   position: relative;
-}
-
-.image-lab-launcher {
-  position: absolute;
-  left: clamp(1rem, 4vw, 2.5rem);
-  top: 50%;
-  transform: translateY(-50%);
-  padding: 0.55rem 1.25rem;
-  background: rgba(124, 130, 170, 0.12);
-  color: var(--text);
-  backdrop-filter: blur(8px);
-  font-size: 0.95rem;
-}
-
-.image-lab-launcher:focus-visible {
-  outline-offset: 4px;
 }
 
 .image-lab {
@@ -320,11 +315,6 @@ section.active {
 }
 
 @media (prefers-color-scheme: dark) {
-  .image-lab-launcher {
-    background: rgba(82, 96, 150, 0.28);
-    color: #e6eafe;
-  }
-
   .image-lab-panel {
     background: rgba(18, 22, 44, 0.94);
     border-color: rgba(148, 156, 214, 0.28);
@@ -900,9 +890,9 @@ select {
   width: 100%;
   padding: 0.65rem 0.75rem;
   border-radius: 12px;
-  border: 1px solid rgba(124, 130, 170, 0.3);
-  background: rgba(255, 255, 255, 0.78);
-  color: var(--text);
+  border: 1px solid var(--form-control-border);
+  background: var(--form-control-bg);
+  color: var(--form-control-text);
   font-size: 1rem;
 }
 
@@ -910,9 +900,9 @@ textarea {
   width: 100%;
   padding: 0.75rem 0.85rem;
   border-radius: 12px;
-  border: 1px solid rgba(124, 130, 170, 0.3);
-  background: rgba(255, 255, 255, 0.78);
-  color: var(--text);
+  border: 1px solid var(--form-control-border);
+  background: var(--form-control-bg);
+  color: var(--form-control-text);
   font-size: 0.95rem;
   font-family: inherit;
   resize: vertical;
@@ -921,6 +911,21 @@ textarea {
 
 input[type="range"] {
   accent-color: var(--primary);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--form-control-placeholder);
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+input[type="range"]:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--form-control-focus-border);
+  box-shadow: 0 0 0 2px var(--form-control-focus-ring);
 }
 
 @media (max-width: 600px) {
