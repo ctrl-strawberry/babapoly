@@ -388,7 +388,6 @@ export const initHome = ({
       <div class="modal add-player-modal" role="dialog" aria-modal="true">
         <header class="add-player-header">
           <h2>Gestionar jugadores</h2>
-          <p>Activa jugadores guardados o crea uno nuevo con una foto personalizada.</p>
         </header>
         <div class="add-player-content">
           <section class="created-players-section">
@@ -481,6 +480,15 @@ export const initHome = ({
     let customOption;
     let customColorInput;
     let customSwatch;
+    const shouldAutofocusNameInput =
+      typeof window !== "undefined" && window.matchMedia
+        ? !window.matchMedia("(pointer: coarse)").matches
+        : true;
+    const focusNameInput = () => {
+      if (shouldAutofocusNameInput) {
+        nameInput.focus({ preventScroll: true });
+      }
+    };
 
     if (actionBar) {
       actionBar.setAttribute("aria-hidden", "true");
@@ -660,9 +668,14 @@ export const initHome = ({
       if (!actionBar) return;
 
       const catalog = state.createdPlayers ?? [];
+      const availablePlayers = catalog.filter(
+        (player) => !isPlayerActive(player.id),
+      );
       const selectedPlayer =
         selectedCreatedPlayerId != null
-          ? catalog.find((player) => player.id === selectedCreatedPlayerId) ?? null
+          ? availablePlayers.find(
+              (player) => player.id === selectedCreatedPlayerId,
+            ) ?? null
           : null;
 
       if (!selectedPlayer) {
@@ -703,24 +716,29 @@ export const initHome = ({
     const renderCreatedPlayersList = () => {
       createdList.innerHTML = "";
       const catalog = state.createdPlayers ?? [];
+      const availablePlayers = catalog.filter(
+        (player) => !isPlayerActive(player.id),
+      );
 
       if (
         selectedCreatedPlayerId &&
-        !catalog.some((player) => player.id === selectedCreatedPlayerId)
+        !availablePlayers.some((player) => player.id === selectedCreatedPlayerId)
       ) {
         selectedCreatedPlayerId = null;
       }
 
-      if (!catalog.length) {
+      if (!availablePlayers.length) {
         updateCreatedPlayerActionBar();
         const emptyMessage = document.createElement("p");
         emptyMessage.className = "helper-text";
-        emptyMessage.textContent = "Todavía no has guardado ningún jugador.";
+        emptyMessage.textContent = catalog.length
+          ? "Todos los jugadores guardados ya están en la partida."
+          : "Todavía no has guardado ningún jugador.";
         createdList.appendChild(emptyMessage);
         return;
       }
 
-      catalog.forEach((player) => {
+      availablePlayers.forEach((player) => {
         const playerColor = sanitizeHexColor(player.colorHex);
 
         const card = document.createElement("article");
@@ -773,7 +791,7 @@ export const initHome = ({
           nameInput.value = player.name;
           syncMoneyInputs(player.money);
           selectColor(playerColor);
-          nameInput.focus();
+          focusNameInput();
         };
 
         const handleSelect = () => {
@@ -988,7 +1006,7 @@ export const initHome = ({
     modalContainer.appendChild(modal);
     activeModal = modal;
     setBottomNavHidden(true);
-    nameInput.focus();
+    focusNameInput();
   };
 
   const handlePlayerClick = (node, playerId) => {

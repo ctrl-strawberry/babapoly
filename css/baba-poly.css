@@ -950,12 +950,14 @@ textarea:focus {
 
 .add-player-modal {
   width: min(780px, 100%);
+  padding: 15px;
 }
 
 .add-player-header {
   display: grid;
   gap: 0.45rem;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1rem;
+  padding: 0;
 }
 
 .add-player-header p {
