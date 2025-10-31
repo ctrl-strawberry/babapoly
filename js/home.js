@@ -5,6 +5,9 @@ import {
   addPlayer,
   deletePlayer,
   DEFAULT_PLAYER_COLOR,
+  upsertCreatedPlayer,
+  removeCreatedPlayer,
+  isPlayerActive,
 } from "./state.js";
 import { formatMoney, readFileAsBase64, toDataUrl } from "./utils.js";
 
@@ -19,11 +22,15 @@ const prefersDarkScheme =
     : null;
 
 const COLOR_PRESETS = [
-  { label: "Negro", value: DEFAULT_PLAYER_COLOR },
+  { label: "Amarillo Solar", value: DEFAULT_PLAYER_COLOR },
   { label: "Neón Violeta", value: "#7f5af0" },
   { label: "Cian Plasma", value: "#00b7ff" },
   { label: "Verde Ácido", value: "#2ce598" },
   { label: "Magenta Pulsar", value: "#ff2d88" },
+  { label: "Coral Prisma", value: "#ff5f57" },
+  { label: "Naranja Aurora", value: "#ff8a4d" },
+  { label: "Azul Profundo", value: "#1f3dff" },
+  { label: "Blanco Holograma", value: "#f5f7ff" },
 ];
 
 const HEX_COLOR_REGEX = /^#([0-9a-f]{6})$/i;
@@ -381,12 +388,16 @@ export const initHome = ({
       <div class="modal add-player-modal" role="dialog" aria-modal="true">
         <header class="add-player-header">
           <h2>Gestionar jugadores</h2>
-          <p>Revisa los jugadores existentes o crea uno nuevo con una foto personalizada.</p>
+          <p>Activa jugadores guardados o crea uno nuevo con una foto personalizada.</p>
         </header>
         <div class="add-player-content">
-          <section class="existing-players-section">
-            <h3>Jugadores actuales</h3>
-            <div class="existing-player-list" id="existingPlayerList"></div>
+          <section class="created-players-section">
+            <h3>Jugadores creados</h3>
+            <div class="created-player-list" id="createdPlayerList"></div>
+            <div class="created-player-action-bar" id="createdPlayerActionBar" hidden>
+              <button class="btn btn-primary" type="button" data-action="addSelected">Añadir</button>
+              <button class="btn btn-danger" type="button" data-action="removeSelected">Eliminar</button>
+            </div>
           </section>
           <form class="new-player-form">
             <h3>Crear jugador</h3>
@@ -399,14 +410,40 @@ export const initHome = ({
             </div>
             <div class="color-picker">
               <span class="color-picker-label">Color del fondo</span>
-              <div class="color-picker-options" id="newPlayerColorOptions"></div>
-              <p class="helper-text color-picker-helper">Se aplicará al fondo ciberpunk del retrato.</p>
+              <div class="color-picker-options" id="newPlayerColorOptions" role="radiogroup" aria-label="Colores predeterminados"></div>
             </div>
-            <label for="newPlayerPhoto">Foto</label>
-            <input id="newPlayerPhoto" type="file" accept="image/*" capture="environment" required>
-            <p class="helper-text add-player-helper">
-              La imagen se enviará a la IA para aplicar el estilo clásico con monóculo, sombrero, bigote y un fondo iluminado con el color elegido.
-            </p>
+            <div class="photo-picker">
+              <span class="photo-picker-label">Foto</span>
+              <div class="photo-picker-options">
+                <button class="photo-picker-option" type="button" data-source="camera">
+                  <span class="photo-picker-icon" aria-hidden="true">
+                    <svg viewBox="0 0 48 48" role="img" focusable="false">
+                      <path
+                        fill="currentColor"
+                        d="M15 12h4.3l2.7-4h10l2.7 4H39a5 5 0 0 1 5 5v18a5 5 0 0 1-5 5H15a5 5 0 0 1-5-5V17a5 5 0 0 1 5-5Zm9 22a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm0-4a4 4 0 1 1 0-8 4 4 0 0 1 0 8Z"
+                      />
+                    </svg>
+                  </span>
+                  <span class="photo-picker-name">Cámara</span>
+                </button>
+                <button class="photo-picker-option" type="button" data-source="gallery">
+                  <span class="photo-picker-icon" aria-hidden="true">
+                    <svg viewBox="0 0 48 48" role="img" focusable="false">
+                      <path
+                        fill="currentColor"
+                        d="M11 6h26a5 5 0 0 1 5 5v26a5 5 0 0 1-5 5H11a5 5 0 0 1-5-5V11a5 5 0 0 1 5-5Zm7 6a5 5 0 1 0 0 10 5 5 0 0 0 0-10Zm-7 24h32L32 22l-8 12-6-8-10 12Z"
+                      />
+                    </svg>
+                  </span>
+                  <span class="photo-picker-name">Galería</span>
+                </button>
+              </div>
+              <input id="newPlayerPhotoCamera" type="file" accept="image/*" capture="environment" hidden>
+              <input id="newPlayerPhotoGallery" type="file" accept="image/*" hidden>
+              <p class="helper-text photo-picker-status" data-selected-photo-text aria-live="polite">
+                Sin imagen seleccionada.
+              </p>
+            </div>
             <div class="modal-actions">
               <button class="btn btn-ghost" type="button" data-action="cancel">Cancelar</button>
               <button class="btn btn-primary" type="submit" data-action="submit">Crear</button>
@@ -421,88 +458,97 @@ export const initHome = ({
     const nameInput = form.querySelector("#newPlayerName");
     const rangeInput = form.querySelector("#newPlayerMoneyRange");
     const numberInput = form.querySelector("#newPlayerMoneyValue");
-    const photoInput = form.querySelector("#newPlayerPhoto");
+    const photoPickerButtons = Array.from(
+      form.querySelectorAll(".photo-picker-option"),
+    );
+    const photoCameraInput = form.querySelector("#newPlayerPhotoCamera");
+    const photoGalleryInput = form.querySelector("#newPlayerPhotoGallery");
+    const photoStatusLabel = form.querySelector("[data-selected-photo-text]");
     const submitButton = form.querySelector("[data-action='submit']");
     const cancelButton = form.querySelector("[data-action='cancel']");
     const statusLabel = modal.querySelector(".add-player-status");
-    const existingList = modal.querySelector("#existingPlayerList");
+    const createdList = modal.querySelector("#createdPlayerList");
+    const actionBar = modal.querySelector("#createdPlayerActionBar");
+    const addSelectedButton =
+      actionBar?.querySelector("[data-action='addSelected']") ?? null;
+    const removeSelectedButton =
+      actionBar?.querySelector("[data-action='removeSelected']") ?? null;
     const colorOptionsContainer = form.querySelector("#newPlayerColorOptions");
 
     const colorButtonMap = new Map();
-    let selectedColorHex = DEFAULT_PLAYER_COLOR;
+    let selectedCreatedPlayerId = null;
+    let selectedColorHex = sanitizeHexColor(DEFAULT_PLAYER_COLOR);
     let customOption;
     let customColorInput;
     let customSwatch;
-    let customHelperLabel;
+
+    if (actionBar) {
+      actionBar.setAttribute("aria-hidden", "true");
+    }
+
+    const setOptionSelection = (option, isSelected) => {
+      if (!option) return;
+      option.classList.toggle("is-selected", Boolean(isSelected));
+      if (option instanceof HTMLElement && option.getAttribute("role") === "radio") {
+        option.setAttribute("aria-checked", isSelected ? "true" : "false");
+      }
+    };
+
+    const updateCustomSwatch = (color) => {
+      if (!customSwatch) return;
+      const sanitized = sanitizeHexColor(color);
+      customSwatch.style.setProperty("--custom-color", sanitized);
+    };
 
     const selectColor = (color, element) => {
       const sanitized = sanitizeHexColor(color);
       selectedColorHex = sanitized;
 
+      const presetOption = colorButtonMap.get(sanitized) ?? null;
+      let target = element ?? presetOption ?? null;
+
+      if (!target && customOption) {
+        target = customOption;
+      }
+
       colorOptionsContainer
         ?.querySelectorAll(".color-option")
         .forEach((option) => {
-          option.classList.remove("is-selected");
-          option.setAttribute("aria-pressed", "false");
+          setOptionSelection(option, option === target);
         });
 
-      const target =
-        element ??
-        colorButtonMap.get(sanitized) ??
-        customOption ??
-        null;
+      const highlightCustom =
+        target === customOption || (!presetOption && customOption);
 
-      if (target) {
-        target.classList.add("is-selected");
-        target.setAttribute("aria-pressed", "true");
-      }
-
-      if (target === customOption && customColorInput) {
-        if (customColorInput.value.toLowerCase() !== sanitized) {
+      if (customColorInput && highlightCustom) {
+        const currentValue = customColorInput.value.toLowerCase();
+        if (currentValue !== sanitized) {
           customColorInput.value = sanitized;
         }
-        customSwatch?.style.setProperty("--swatch-color", sanitized);
-        customHelperLabel && (customHelperLabel.textContent = sanitized.toUpperCase());
-      } else if (customColorInput) {
-        customSwatch?.style.setProperty("--swatch-color", customColorInput.value);
-        customHelperLabel &&
-          (customHelperLabel.textContent = customColorInput.value.toUpperCase());
+        updateCustomSwatch(sanitized);
       }
+
+      setOptionSelection(customOption, highlightCustom);
     };
 
     const createColorOption = ({ label, value }) => {
       const sanitized = sanitizeHexColor(value);
-      const option = document.createElement("div");
+      const option = document.createElement("button");
+      option.type = "button";
       option.className = "color-option";
-      option.tabIndex = 0;
-      option.setAttribute("role", "button");
-      option.setAttribute("aria-pressed", "false");
       option.dataset.color = sanitized;
+      option.setAttribute("role", "radio");
+      option.setAttribute("aria-checked", "false");
+      option.setAttribute("aria-label", label);
 
       const swatch = document.createElement("span");
       swatch.className = "color-option-swatch";
       swatch.style.setProperty("--swatch-color", sanitized);
 
-      const name = document.createElement("span");
-      name.className = "color-option-name";
-      name.textContent = label;
+      option.append(swatch);
 
-      const helper = document.createElement("span");
-      helper.className = "color-option-helper";
-      helper.textContent = sanitized.toUpperCase();
-
-      option.append(swatch, name, helper);
-
-      option.addEventListener("click", (event) => {
-        event.preventDefault();
+      option.addEventListener("click", () => {
         selectColor(sanitized, option);
-      });
-
-      option.addEventListener("keydown", (event) => {
-        if (event.key === "Enter" || event.key === " ") {
-          event.preventDefault();
-          selectColor(sanitized, option);
-        }
       });
 
       colorButtonMap.set(sanitized, option);
@@ -510,37 +556,43 @@ export const initHome = ({
     };
 
     const createCustomOption = () => {
-      const option = document.createElement("div");
+      const option = document.createElement("button");
+      option.type = "button";
       option.className = "color-option color-option-custom";
-      option.setAttribute("role", "button");
-      option.setAttribute("aria-pressed", "false");
-      option.tabIndex = 0;
+      option.setAttribute("role", "radio");
+      option.setAttribute("aria-checked", "false");
+      option.setAttribute("aria-label", "Color personalizado");
+      option.dataset.custom = "true";
 
       const swatch = document.createElement("span");
-      swatch.className = "color-option-swatch";
-      swatch.style.setProperty("--swatch-color", DEFAULT_PLAYER_COLOR);
+      swatch.className = "color-option-swatch color-option-swatch-multi";
 
-      const name = document.createElement("span");
-      name.className = "color-option-name";
-      name.textContent = "Personalizar";
-
-      const helper = document.createElement("span");
-      helper.className = "color-option-helper";
-      helper.textContent = DEFAULT_PLAYER_COLOR.toUpperCase();
+      const indicator = document.createElement("span");
+      indicator.className = "color-option-custom-indicator";
+      swatch.appendChild(indicator);
 
       const colorInput = document.createElement("input");
       colorInput.type = "color";
       colorInput.value = DEFAULT_PLAYER_COLOR;
-      colorInput.id = "newPlayerCustomColor";
       colorInput.className = "color-option-color-input";
-      colorInput.setAttribute("aria-label", "Elige un color personalizado");
+      colorInput.setAttribute("aria-label", "Elegir color personalizado");
       colorInput.tabIndex = -1;
 
-      option.append(swatch, name, helper, colorInput);
+      option.append(swatch, colorInput);
+
+      customOption = option;
+      customColorInput = colorInput;
+      customSwatch = swatch;
+      updateCustomSwatch(colorInput.value);
 
       const openPicker = () => {
         selectColor(colorInput.value, option);
-        colorInput.click();
+        colorInput.focus();
+        if (typeof colorInput.showPicker === "function") {
+          colorInput.showPicker();
+        } else {
+          colorInput.click();
+        }
       };
 
       option.addEventListener("click", (event) => {
@@ -558,21 +610,16 @@ export const initHome = ({
         }
       });
 
-      const handleCustomChange = () => {
+      colorInput.addEventListener("input", () => {
         selectColor(colorInput.value, option);
-      };
-
-      colorInput.addEventListener("input", handleCustomChange);
-      colorInput.addEventListener("change", handleCustomChange);
-
-      colorInput.addEventListener("click", (event) => {
-        event.stopPropagation();
+      });
+      colorInput.addEventListener("change", () => {
+        selectColor(colorInput.value, option);
+      });
+      colorInput.addEventListener("focus", () => {
         selectColor(colorInput.value, option);
       });
 
-      customColorInput = colorInput;
-      customHelperLabel = helper;
-      customSwatch = swatch;
       return option;
     };
 
@@ -581,10 +628,13 @@ export const initHome = ({
         const option = createColorOption(preset);
         colorOptionsContainer.appendChild(option);
       });
-      customOption = createCustomOption();
-      colorOptionsContainer.appendChild(customOption);
-      selectColor(DEFAULT_PLAYER_COLOR, colorButtonMap.get(DEFAULT_PLAYER_COLOR));
+      const custom = createCustomOption();
+      if (custom) {
+        colorOptionsContainer.appendChild(custom);
+      }
     }
+
+    selectColor(selectedColorHex, colorButtonMap.get(selectedColorHex));
 
     const clampMoney = (value) => {
       const min = Number(rangeInput.min);
@@ -599,47 +649,272 @@ export const initHome = ({
       numberInput.value = clamped;
     };
 
-    const renderExistingPlayersList = () => {
-      existingList.innerHTML = "";
-      if (!state.players.length) {
-        const emptyMessage = document.createElement("p");
-        emptyMessage.className = "helper-text";
-        emptyMessage.textContent = "Todavía no hay jugadores registrados.";
-        existingList.appendChild(emptyMessage);
+    const setStatusMessage = (message, { error = false } = {}) => {
+      if (!statusLabel) return;
+      statusLabel.textContent = message ?? "";
+      statusLabel.classList.toggle("is-error", Boolean(error));
+    };
+    setStatusMessage("");
+
+    const updateCreatedPlayerActionBar = () => {
+      if (!actionBar) return;
+
+      const catalog = state.createdPlayers ?? [];
+      const selectedPlayer =
+        selectedCreatedPlayerId != null
+          ? catalog.find((player) => player.id === selectedCreatedPlayerId) ?? null
+          : null;
+
+      if (!selectedPlayer) {
+        actionBar.hidden = true;
+        actionBar.setAttribute("aria-hidden", "true");
+        if (addSelectedButton) {
+          addSelectedButton.disabled = true;
+          addSelectedButton.textContent = "Añadir";
+          addSelectedButton.title =
+            "Selecciona un jugador para añadirlo a la partida";
+        }
+        if (removeSelectedButton) {
+          removeSelectedButton.disabled = true;
+          removeSelectedButton.title =
+            "Selecciona un jugador para eliminarlo del catálogo";
+        }
         return;
       }
 
-      state.players.forEach((player) => {
-        const item = document.createElement("button");
-        item.type = "button";
-        item.className = "existing-player-item";
-        item.innerHTML = `
-          <span class="existing-player-name">${player.name}</span>
-          <span class="existing-player-money">${formatMoney(player.money)}</span>
-        `;
+      actionBar.hidden = false;
+      actionBar.setAttribute("aria-hidden", "false");
+
+      if (removeSelectedButton) {
+        removeSelectedButton.disabled = false;
+        removeSelectedButton.title = `Eliminar a ${selectedPlayer.name} del catálogo`;
+      }
+
+      if (addSelectedButton) {
+        const alreadyActive = isPlayerActive(selectedPlayer.id);
+        addSelectedButton.disabled = alreadyActive;
+        addSelectedButton.textContent = alreadyActive ? "Añadido" : "Añadir";
+        addSelectedButton.title = alreadyActive
+          ? `${selectedPlayer.name} ya está en la partida.`
+          : `Añadir a ${selectedPlayer.name} a la partida`;
+      }
+    };
+
+    const renderCreatedPlayersList = () => {
+      createdList.innerHTML = "";
+      const catalog = state.createdPlayers ?? [];
+
+      if (
+        selectedCreatedPlayerId &&
+        !catalog.some((player) => player.id === selectedCreatedPlayerId)
+      ) {
+        selectedCreatedPlayerId = null;
+      }
+
+      if (!catalog.length) {
+        updateCreatedPlayerActionBar();
+        const emptyMessage = document.createElement("p");
+        emptyMessage.className = "helper-text";
+        emptyMessage.textContent = "Todavía no has guardado ningún jugador.";
+        createdList.appendChild(emptyMessage);
+        return;
+      }
+
+      catalog.forEach((player) => {
         const playerColor = sanitizeHexColor(player.colorHex);
-        const nameNode = item.querySelector(".existing-player-name");
-        applyNameAccent(nameNode, playerColor);
+
+        const card = document.createElement("article");
+        card.className = "created-player-card";
+        card.dataset.playerId = player.id;
+        card.tabIndex = 0;
+        card.setAttribute("role", "button");
+
+        const info = document.createElement("div");
+        info.className = "created-player-info";
+
+        const avatar = document.createElement("div");
+        avatar.className = "created-player-avatar";
         if (player.avatar) {
-          const avatarPreview = document.createElement("img");
-          avatarPreview.src = player.avatar;
-          avatarPreview.alt = `Avatar de ${player.name}`;
-          avatarPreview.loading = "lazy";
-          avatarPreview.decoding = "async";
-          avatarPreview.className = "existing-player-avatar";
-          item.prepend(avatarPreview);
+          const avatarImage = document.createElement("img");
+          avatarImage.src = player.avatar;
+          avatarImage.alt = `Avatar de ${player.name}`;
+          avatarImage.loading = "lazy";
+          avatarImage.decoding = "async";
+          avatar.appendChild(avatarImage);
+        } else {
+          avatar.textContent = player.name?.[0]?.toUpperCase() ?? "?";
         }
-        item.addEventListener("click", () => {
+
+        const details = document.createElement("div");
+        details.className = "created-player-details";
+
+        const nameNode = document.createElement("span");
+        nameNode.className = "created-player-name";
+        nameNode.textContent = player.name;
+        applyNameAccent(nameNode, playerColor);
+
+        const meta = document.createElement("div");
+        meta.className = "created-player-meta";
+
+        const moneyNode = document.createElement("span");
+        moneyNode.className = "created-player-money";
+        moneyNode.textContent = formatMoney(player.money);
+
+        const colorIndicator = document.createElement("span");
+        colorIndicator.className = "created-player-color";
+        colorIndicator.style.setProperty("--player-color", playerColor);
+        colorIndicator.title = `Color ${playerColor.toUpperCase()}`;
+
+        meta.append(moneyNode, colorIndicator);
+        details.append(nameNode, meta);
+        info.append(avatar, details);
+
+        const prefillFromCatalogEntry = () => {
           nameInput.value = player.name;
           syncMoneyInputs(player.money);
           selectColor(playerColor);
           nameInput.focus();
+        };
+
+        const handleSelect = () => {
+          if (selectedCreatedPlayerId !== player.id) {
+            createdList
+              .querySelectorAll(".created-player-card.is-selected")
+              .forEach((element) => element.classList.remove("is-selected"));
+            selectedCreatedPlayerId = player.id;
+            card.classList.add("is-selected");
+            updateCreatedPlayerActionBar();
+          }
+          prefillFromCatalogEntry();
+        };
+
+        card.addEventListener("click", handleSelect);
+        card.addEventListener("keydown", (event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            handleSelect();
+          }
         });
-        existingList.appendChild(item);
+
+        if (selectedCreatedPlayerId === player.id) {
+          card.classList.add("is-selected");
+        }
+
+        card.append(info);
+        createdList.appendChild(card);
       });
+
+      updateCreatedPlayerActionBar();
     };
 
-    renderExistingPlayersList();
+    addSelectedButton?.addEventListener("click", () => {
+      if (!selectedCreatedPlayerId) return;
+      const catalog = state.createdPlayers ?? [];
+      const player =
+        catalog.find((item) => item.id === selectedCreatedPlayerId) ?? null;
+      if (!player) {
+        selectedCreatedPlayerId = null;
+        renderCreatedPlayersList();
+        return;
+      }
+      if (isPlayerActive(player.id)) {
+        updateCreatedPlayerActionBar();
+        setStatusMessage(`${player.name} ya está en la partida actual.`);
+        return;
+      }
+      addPlayer({
+        ...player,
+        pet: { ...player.pet },
+      });
+      renderPlayers();
+      setStatusMessage(`${player.name} se añadió a la partida.`);
+      renderCreatedPlayersList();
+    });
+
+    removeSelectedButton?.addEventListener("click", () => {
+      if (!selectedCreatedPlayerId) return;
+      const catalog = state.createdPlayers ?? [];
+      const player =
+        catalog.find((item) => item.id === selectedCreatedPlayerId) ?? null;
+      if (!player) {
+        selectedCreatedPlayerId = null;
+        renderCreatedPlayersList();
+        return;
+      }
+      const wasActive = isPlayerActive(player.id);
+      removeCreatedPlayer(player.id);
+      selectedCreatedPlayerId = null;
+      renderCreatedPlayersList();
+      const suffix = wasActive
+        ? " Sigue disponible en la partida actual."
+        : "";
+      setStatusMessage(`${player.name} se eliminó del catálogo.${suffix}`);
+    });
+
+    let selectedPhotoFile = null;
+
+    const resetPhotoSelection = () => {
+      selectedPhotoFile = null;
+      if (photoStatusLabel) {
+        photoStatusLabel.textContent = "Sin imagen seleccionada.";
+        photoStatusLabel.classList.remove("is-error");
+      }
+      photoPickerButtons.forEach((button) =>
+        button.classList.remove("is-selected"),
+      );
+    };
+
+    resetPhotoSelection();
+
+    const applyPhotoSelection = (file, source) => {
+      if (!file) {
+        resetPhotoSelection();
+        return;
+      }
+      selectedPhotoFile = file;
+      photoPickerButtons.forEach((button) => {
+        button.classList.toggle(
+          "is-selected",
+          button.dataset.source === source,
+        );
+      });
+      if (photoStatusLabel) {
+        photoStatusLabel.textContent = file.name;
+        photoStatusLabel.classList.remove("is-error");
+      }
+    };
+
+    const handleInputSelection = (input, source) => {
+      const file = input?.files?.[0] ?? null;
+      if (file) {
+        applyPhotoSelection(file, source);
+      } else if (!selectedPhotoFile) {
+        resetPhotoSelection();
+      }
+      if (input) {
+        input.value = "";
+      }
+    };
+
+    photoCameraInput?.addEventListener("change", () =>
+      handleInputSelection(photoCameraInput, "camera"),
+    );
+    photoGalleryInput?.addEventListener("change", () =>
+      handleInputSelection(photoGalleryInput, "gallery"),
+    );
+
+    photoPickerButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const source = button.dataset.source;
+        if (source === "camera") {
+          photoCameraInput?.click();
+        } else if (source === "gallery") {
+          photoGalleryInput?.click();
+        }
+      });
+    });
+
+    renderCreatedPlayersList();
 
     rangeInput.addEventListener("input", (event) => syncMoneyInputs(event.target.value));
     numberInput.addEventListener("input", (event) => syncMoneyInputs(event.target.value));
@@ -651,7 +926,7 @@ export const initHome = ({
 
       const name = nameInput.value.trim();
       const money = Number(rangeInput.value);
-      const photoFile = photoInput.files?.[0] ?? null;
+      const photoFile = selectedPhotoFile ?? null;
 
       if (!name) {
         nameInput.reportValidity();
@@ -659,7 +934,12 @@ export const initHome = ({
       }
 
       if (!photoFile) {
-        photoInput.reportValidity();
+        if (photoStatusLabel) {
+          photoStatusLabel.textContent =
+            "Selecciona una imagen para crear al jugador.";
+          photoStatusLabel.classList.add("is-error");
+        }
+        photoPickerButtons[0]?.focus({ preventScroll: true });
         return;
       }
 
@@ -672,14 +952,17 @@ export const initHome = ({
       try {
         const colorHex = sanitizeHexColor(selectedColorHex);
         const avatarDataUrl = await requestAvatarFromBackend(photoFile, { colorHex });
-        addPlayer({
+        const newPlayer = {
           id: crypto.randomUUID(),
           name,
           money,
           pet: { level: 1, xp: 0 },
           avatar: avatarDataUrl,
           colorHex,
-        });
+        };
+        addPlayer(newPlayer);
+        upsertCreatedPlayer(newPlayer);
+        renderCreatedPlayersList();
         closeModal();
         renderPlayers();
       } catch (error) {
