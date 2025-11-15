@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Baba Poly · Laboratorio</title>
+  <base href="../">
+  <script>
+    window.BABA_POLY_AVATAR_ENDPOINT = "https://baba-poly-worker.babapoly.workers.dev/api/edit-avatar";
+  </script>
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <link rel="stylesheet" href="css/baba-poly.css">
+  <link rel="stylesheet" href="css/navbar.css">
+</head>
+<body>
+  <div class="app-shell">
+    <main>
+      <section id="screen-image-lab" class="active" aria-labelledby="imageLabTitle">
+        <div class="image-lab">
+          <div class="image-lab-top">
+            <button class="btn btn-ghost" type="button" id="imageLabBackBtn" aria-label="Volver a Inicio">
+              ← Volver a Inicio
+            </button>
+            <span class="image-lab-status" id="imageLabStatus"></span>
+          </div>
+          <h2 id="imageLabTitle" class="section-title">Laboratorio de imágenes</h2>
+          <p class="helper-text image-lab-description">
+            Prueba llamadas a tu backend y a la API de Google para depurar la generación de avatares. Esta herramienta sólo se sirve en local; no expongas la clave públicamente.
+          </p>
+          <div class="image-lab-grid">
+            <form id="imageLabForm" class="image-lab-panel" autocomplete="off">
+              <fieldset>
+                <legend>Entrada</legend>
+                <label for="imageLabFile" class="image-lab-label">Imagen base</label>
+                <input type="file" id="imageLabFile" accept="image/*">
+                <div class="image-lab-actions">
+                  <button class="btn btn-ghost" type="button" id="imageLabSampleBtn">Usar mascota de ejemplo</button>
+                  <button class="btn btn-ghost" type="button" id="imageLabClearBtn">Limpiar</button>
+                </div>
+
+                <figure class="image-lab-preview">
+                  <img id="imageLabSourcePreview" alt="Vista previa de la imagen base" loading="lazy">
+                  <figcaption id="imageLabSourceInfo" class="helper-text">Carga una imagen para comenzar.</figcaption>
+                </figure>
+
+                <label for="imageLabPrompt" class="image-lab-label">Prompt</label>
+                <textarea id="imageLabPrompt" rows="3" spellcheck="false"></textarea>
+
+                <div class="image-lab-inline">
+                  <div>
+                    <label for="imageLabModel" class="image-lab-label">Modelo</label>
+                    <input type="text" id="imageLabModel" value="gemini-2.5-flash-image">
+                  </div>
+                  <div>
+                    <label for="imageLabMode" class="image-lab-label">Modo</label>
+                    <select id="imageLabMode">
+                      <option value="edit">Editar imagen subida</option>
+                      <option value="generate">Generar desde prompt</option>
+                    </select>
+                  </div>
+                </div>
+
+                <label for="imageLabEndpoint" class="image-lab-label">Endpoint del backend</label>
+                <input type="url" id="imageLabEndpoint" placeholder="/api/edit-avatar">
+
+                <label for="imageLabAdvancedJson" class="image-lab-label">Campos extra (JSON opcional)</label>
+                <textarea id="imageLabAdvancedJson" rows="4" spellcheck="false" placeholder='{"editConfig":{"referenceSubjectStrength":0.4}}'></textarea>
+                <span class="helper-text">Se fusiona con el cuerpo enviado al backend y a Google.</span>
+
+                <label class="image-lab-checkbox">
+                  <input type="checkbox" id="imageLabIncludeRaw">
+                  Incluir respuesta cruda de Google en la salida del backend
+                </label>
+
+                <div class="image-lab-actions">
+                  <button class="btn btn-primary" type="button" id="imageLabBackendBtn">Probar backend</button>
+                </div>
+
+                <details class="image-lab-direct">
+                  <summary>Prueba directa con la API de Google (uso local)</summary>
+                  <label for="imageLabApiKey" class="image-lab-label">Clave de Google</label>
+                  <input type="password" id="imageLabApiKey" autocomplete="off" placeholder="AIza...">
+                  <span class="helper-text">La clave sólo se usa desde tu navegador. No la compartas.</span>
+                  <button class="btn btn-ghost" type="button" id="imageLabDirectBtn">Llamar a Google directamente</button>
+                </details>
+              </fieldset>
+            </form>
+
+            <div class="image-lab-panel image-lab-results">
+              <h3>Resultados</h3>
+              <div class="image-lab-preview-grid">
+                <figure class="image-lab-preview">
+                  <img id="imageLabResultPreview" alt="Resultado de la llamada" loading="lazy">
+                  <figcaption id="imageLabResultInfo" class="helper-text">Aún no hay resultados.</figcaption>
+                </figure>
+              </div>
+
+              <label for="imageLabRequestPreview" class="image-lab-label">Payloads preparados</label>
+              <textarea id="imageLabRequestPreview" rows="10" readonly spellcheck="false"></textarea>
+
+              <label for="imageLabResponsePreview" class="image-lab-label">Respuesta recibida</label>
+              <textarea id="imageLabResponsePreview" rows="12" readonly spellcheck="false"></textarea>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script type="module" src="js/lab-page.js"></script>
+</body>
+</html>

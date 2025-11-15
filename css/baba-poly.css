@@ -4,7 +4,6 @@
   --bg: #f4f6fd;
   --bg-dark: #101326;
   --card: rgba(255, 255, 255, 0.88);
-  --card-dark: rgba(18, 21, 41, 0.9);
   --card-border: rgba(124, 130, 170, 0.18);
   --card-border-dark: rgba(148, 156, 214, 0.32);
   --primary: #7f5af0;
@@ -35,7 +34,7 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --bg: var(--bg-dark);
-    --card: var(--card-dark);
+    --card: rgba(18, 21, 41, 0.9);
     --card-border: var(--card-border-dark);
     --text: #eceffd;
     --text-muted: #9ca5c8;
@@ -574,6 +573,42 @@ section.active {
   gap: 0.75rem;
 }
 
+.bank-pot-row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  width: 100%;
+  gap: 0.55rem;
+  justify-content: flex-start;
+}
+
+.bank-pot-row .pot-card-wrapper,
+.bank-pot-row .bank-card-wrapper {
+  display: flex;
+}
+
+.bank-pot-row .pot-card-wrapper {
+  flex: 0 0 auto;
+  width: clamp(110px, 22vw, 140px);
+  justify-content: center;
+  align-items: center;
+}
+
+.bank-pot-row .bank-card-wrapper {
+  flex: 1 1 0%;
+  min-width: 0;
+  align-items: stretch;
+}
+
+.bank-pot-row .pot-card-wrapper .player-card {
+  width: 100%;
+}
+
+.bank-pot-row .bank-card-wrapper .player-card {
+  width: 100%;
+}
+
 .player-card {
   --player-accent: var(--primary);
   --avatar-fade-left-width: 19%;
@@ -637,30 +672,156 @@ section.active {
 }
 
 .player-card.bank-card {
-  padding: 20px 1.2rem;
-  background: linear-gradient(135deg, rgba(127, 90, 240, 0.1), rgba(127, 90, 240, 0.05));
-  border-color: rgba(127, 90, 240, 0.28);
+  border: none;
+  position: relative;
+  overflow: hidden;
+  background-image: url("../assets/banca_oscuro.gif");
+  background-size: cover;
+  background-position: center;
+  border-radius: 32px;
+}
+
+.player-card.bank-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 32px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(0, 0, 0, 0.2));
+  pointer-events: none;
+}
+
+.player-card.bank-card .player-card-content {
+  justify-content: center;
+}
+
+.player-card.bank-card .player-card-info {
+  align-items: center;
+  text-align: center;
+  gap: 0.5rem;
+  font-family: "Poppins", "Nunito", "Segoe UI", system-ui, -apple-system, sans-serif;
 }
 
 .player-card.bank-card .player-name {
-  color: var(--primary);
+  font-size: 0.95rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: #f5f7ff;
+  font-weight: 600;
+  text-shadow:
+    0 6px 15px rgba(5, 10, 36, 0.7),
+    0 0 18px rgba(255, 255, 255, 0.3);
 }
 
 .player-card.bank-card .player-money {
-  color: rgba(127, 90, 240, 0.85);
+  font-size: 1.4rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(241, 244, 255, 0.95);
+  font-weight: 500;
+  text-shadow:
+    0 4px 12px rgba(6, 9, 24, 0.5),
+    0 0 16px rgba(127, 90, 240, 0.35);
+}
+
+@media (prefers-color-scheme: light) {
+  .player-card.bank-card {
+    background-image: url("../assets/banca_claro.gif");
+    box-shadow: none;
+  }
+
+  .player-card.bank-card::before {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.35), rgba(215, 220, 252, 0.15));
+  }
+
+  .player-card.bank-card .player-name,
+  .player-card.bank-card .player-money {
+    color: #f5f7ff;
+    text-shadow:
+      0 4px 12px rgba(10, 10, 30, 0.45),
+      0 0 18px rgba(255, 255, 255, 0.55);
+  }
 }
 
 .player-card.pot-card {
-  background: linear-gradient(135deg, rgba(76, 199, 217, 0.12), rgba(76, 199, 217, 0.06));
-  border-color: rgba(76, 199, 217, 0.3);
+  border: none;
+  background: transparent;
+  padding: clamp(0.45rem, 1.5vw, 0.85rem);
+  overflow: visible;
+  position: relative;
+  isolation: isolate;
+  cursor: default;
 }
 
-.player-card.pot-card .player-name {
-  color: var(--primary-alt);
+.player-card.pot-card::after {
+  content: "";
+  position: absolute;
+  inset: clamp(0.25rem, 1.2vw, 0.75rem);
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 22px;
+  filter: blur(30px);
+  opacity: 0.4;
+  z-index: -1;
 }
 
-.player-card.pot-card .player-money {
-  color: rgba(76, 199, 217, 0.9);
+.player-card.pot-card .player-card-content {
+  justify-content: center;
+  padding: 0;
+}
+
+.player-card.pot-card .player-card-info {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 0.35rem;
+  flex: 0 1 auto;
+  width: 100%;
+  padding: clamp(0.3rem, 1vw, 0.6rem) 0;
+  height: clamp(48px, 14vw, 60px);
+  position: relative;
+}
+
+.player-card.pot-card .player-card-info::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(90px, 60%);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background-image: url("../assets/burbuja.webp");
+  background-size: cover;
+  background-position: center;
+  filter: drop-shadow(0 18px 30px rgba(105, 69, 171, 0.45));
+  opacity: 0.95;
+}
+
+.player-card.pot-card .pot-card-label,
+.player-card.pot-card .pot-card-amount {
+  position: relative;
+  z-index: 1;
+  color: #fff;
+  text-shadow: 0 2px 10px rgba(5, 10, 24, 0.6);
+}
+
+.player-card.pot-card .pot-card-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.35em;
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+.player-card.pot-card .pot-card-amount {
+  font-size: clamp(1.2rem, 3vw, 1.6rem);
+  font-weight: 700;
+}
+
+@media (prefers-color-scheme: light) {
+  .player-card.pot-card .pot-card-label,
+  .player-card.pot-card .pot-card-amount {
+    color: #111;
+    text-shadow: none;
+  }
 }
 
 .player-card-content {

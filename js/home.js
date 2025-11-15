@@ -95,6 +95,14 @@ const AVATAR_EDIT_ENDPOINT =
     ? window.BABA_POLY_AVATAR_ENDPOINT
     : "/api/edit-avatar";
 
+const formatPotValue = (amount) => {
+  const numericValue = Number(amount);
+  if (!Number.isFinite(numericValue)) {
+    return "0";
+  }
+  return numericValue.toLocaleString("es-ES");
+};
+
 const requestAvatarFromBackend = async (
   file,
   { colorHex = DEFAULT_PLAYER_COLOR } = {},
@@ -155,6 +163,59 @@ export const initHome = ({
   const transferState = { from: null, to: null };
   let editingMode = false;
   let activeModal = null;
+  let potAmountNodeRef = null;
+  let potDisplayValue = state.pot ?? 0;
+  let potAnimationTimer = null;
+  const POT_ANIMATION_DURATION = 3000;
+
+  const clearPotAnimation = () => {
+    if (potAnimationTimer) {
+      clearInterval(potAnimationTimer);
+      potAnimationTimer = null;
+    }
+  };
+
+  const updatePotAmountNode = (value) => {
+    if (!potAmountNodeRef) return;
+    potAmountNodeRef.textContent = formatPotValue(value);
+  };
+
+  const animatePotValue = (from, to) => {
+    clearPotAnimation();
+
+    if (!Number.isFinite(from) || !Number.isFinite(to) || from === to) {
+      potDisplayValue = to;
+      updatePotAmountNode(to);
+      return;
+    }
+
+    potDisplayValue = from;
+    updatePotAmountNode(from);
+
+    const totalSteps = Math.abs(Math.round(to - from));
+    if (!totalSteps) {
+      potDisplayValue = to;
+      updatePotAmountNode(to);
+      return;
+    }
+
+    const stepDirection = to > from ? 1 : -1;
+    const stepDuration = POT_ANIMATION_DURATION / totalSteps;
+
+    potAnimationTimer = setInterval(() => {
+      if (!potAmountNodeRef) {
+        clearPotAnimation();
+        return;
+      }
+
+      potDisplayValue += stepDirection;
+      updatePotAmountNode(potDisplayValue);
+
+      if (potDisplayValue === to) {
+        clearPotAnimation();
+      }
+    }, stepDuration);
+  };
 
   addPlayerBtn.hidden = true;
 
@@ -1037,6 +1098,8 @@ export const initHome = ({
 
   const renderPlayers = () => {
     playerList.innerHTML = "";
+    clearPotAnimation();
+    potAmountNodeRef = null;
 
     const bankCard = playerCardTemplate.content.firstElementChild.cloneNode(true);
     bankCard.dataset.playerId = BANK_PLAYER_ID;
@@ -1049,21 +1112,52 @@ export const initHome = ({
     bankCard.querySelector(".player-card-visual")?.remove();
     bankCard.querySelector("[data-action='delete']")?.remove();
     bankCard.addEventListener("click", () => handlePlayerClick(bankCard, BANK_PLAYER_ID));
-    playerList.appendChild(bankCard);
 
     const potCard = playerCardTemplate.content.firstElementChild.cloneNode(true);
     potCard.dataset.playerId = POT_PLAYER_ID;
     potCard.classList.add("pot-card");
-    potCard.querySelector(".player-name").textContent = POT_PLAYER_NAME;
+    const potCardContent = potCard.querySelector(".player-card-content");
+    potCardContent?.classList.add("pot-card-content");
+
+    const potInfo = potCard.querySelector(".player-card-info");
+    potInfo?.classList.add("pot-card-info");
+
+    const potNameNode = potCard.querySelector(".player-name");
+    if (potNameNode) {
+      potNameNode.textContent = POT_PLAYER_NAME.toUpperCase();
+      potNameNode.classList.add("pot-card-label");
+    }
+
     const potMoneyNode = potCard.querySelector(".player-money");
     if (potMoneyNode) {
-      potMoneyNode.textContent = formatMoney(state.pot ?? 0);
+      potAmountNodeRef = potMoneyNode;
+      const targetPotValue = state.pot ?? 0;
+      if (potDisplayValue !== targetPotValue) {
+        animatePotValue(potDisplayValue, targetPotValue);
+      } else {
+        updatePotAmountNode(targetPotValue);
+      }
+      potMoneyNode.classList.add("pot-card-amount");
     }
     potCard.querySelector(".player-card-visual")?.remove();
     potCard.querySelector("[data-action='delete']")?.remove();
     potCard.disabled = true;
     potCard.classList.add("is-static");
-    playerList.appendChild(potCard);
+
+    const bankPotRow = document.createElement("div");
+    bankPotRow.classList.add("bank-pot-row");
+
+    const potWrapper = document.createElement("div");
+    potWrapper.classList.add("pot-card-wrapper");
+    potWrapper.appendChild(potCard);
+
+    const bankWrapper = document.createElement("div");
+    bankWrapper.classList.add("bank-card-wrapper");
+    bankWrapper.appendChild(bankCard);
+
+    bankPotRow.appendChild(potWrapper);
+    bankPotRow.appendChild(bankWrapper);
+    playerList.appendChild(bankPotRow);
 
     state.players.forEach((player) => {
       const card = playerCardTemplate.content.firstElementChild.cloneNode(true);
