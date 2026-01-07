@@ -39,71 +39,45 @@ const enemyLevelLabel = document.getElementById("enemyLevelLabel");
 const playerCharacterSprite = document.querySelector(".battle-character-player");
 const enemyCharacterSprite = document.querySelector(".battle-character-enemy");
 
-const roulettePlayer = document.getElementById("roulettePlayer");
-const rouletteAmount = document.getElementById("rouletteAmount");
-const rouletteNumber = document.getElementById("rouletteNumber");
-const rouletteHelper = document.getElementById("rouletteHelper");
+const rouletteSelect = document.getElementById("rouletteSelect");
+const rouletteGame = document.getElementById("rouletteGame");
 const rouletteWheel = document.getElementById("rouletteWheel");
-const rouletteResult = document.getElementById("rouletteResult");
+const rouletteBoard = document.getElementById("rouletteBoard");
+const roulettePlayerName = document.getElementById("roulettePlayerName");
+const roulettePlayerMoney = document.getElementById("roulettePlayerMoney");
+const rouletteMessage = document.getElementById("rouletteMessage");
+const chipSelector = document.getElementById("chipSelector");
 const spinBtn = document.getElementById("spinBtn");
+const clearBetsBtn = document.getElementById("clearBetsBtn");
+const rouletteExitBtn = document.getElementById("rouletteExitBtn");
+const lastResults = document.getElementById("lastResults");
 
 const deriveBasePath = () => {
-  if (typeof window === "undefined") {
-    return "/";
-  }
-  const segments = window.location.pathname.split("/").filter(Boolean);
-  if (!segments.length) {
-    return "/";
-  }
-  const lastSegment = segments[segments.length - 1];
-  if (
-    lastSegment.includes(".") ||
-    Object.prototype.hasOwnProperty.call(screens, lastSegment)
-  ) {
-    segments.pop();
-  }
-  if (!segments.length) {
-    return "/";
-  }
-  return `/${segments.join("/")}/`;
+  return "/";
 };
 
 const basePath = deriveBasePath();
-
-const normalizePathname = (pathname) => {
-  if (!pathname || pathname === "/") {
-    return "/";
-  }
-  return pathname.endsWith("/") && pathname.length > 1
-    ? pathname.slice(0, -1)
-    : pathname;
-};
 
 const getScreenFromLocation = () => {
   if (typeof window === "undefined") {
     return "inicio";
   }
-  const normalized = normalizePathname(window.location.pathname);
-  if (normalized === "/") {
+  const hash = window.location.hash;
+  if (!hash || hash === "#" || hash === "#/") {
     return "inicio";
   }
-  const segments = normalized.split("/").filter(Boolean);
-  if (!segments.length) {
-    return "inicio";
-  }
-  const lastSegment = segments[segments.length - 1];
-  if (Object.prototype.hasOwnProperty.call(screens, lastSegment)) {
-    return lastSegment;
+  const screenId = hash.replace(/^#\/?/, "");
+  if (Object.prototype.hasOwnProperty.call(screens, screenId)) {
+    return screenId;
   }
   return "inicio";
 };
 
 const buildPathForScreen = (screenId) => {
-  const prefix = basePath === "/" ? "/" : basePath;
   if (screenId === "inicio") {
-    return prefix;
+    return "/";
   }
-  return `${prefix}${screenId}`;
+  return `/#/${screenId}`;
 };
 
 const showToast = (message) => {
@@ -128,7 +102,7 @@ const home = initHome({
   bottomNav,
   onPlayersUpdated: (players) => {
     jimboApi?.renderPlayerSelector(players);
-    rouletteApi?.renderPlayerOptions(players);
+    rouletteApi?.renderPlayerSelector(players);
   },
 });
 
@@ -156,18 +130,25 @@ jimboApi = initJimbo({
 });
 
 rouletteApi = initRoulette({
-  roulettePlayer,
-  rouletteAmount,
-  rouletteNumber,
-  rouletteHelper,
+  rouletteSelect,
+  rouletteGame,
   rouletteWheel,
-  rouletteResult,
+  rouletteBoard,
+  roulettePlayerName,
+  roulettePlayerMoney,
+  rouletteMessage,
+  chipSelector,
   spinBtn,
+  clearBetsBtn,
+  rouletteExitBtn,
+  lastResults,
+  playerSelectTemplate,
   showScreen: (screenId) => showScreen(screenId),
   showToast,
   homeActions: {
     render: () => home.render(),
     showMoneyAnimation: (playerId, amount) => home.showMoneyAnimation(playerId, amount),
+    getPlayers: () => state.players, // Added this helper
   },
 });
 
@@ -202,7 +183,10 @@ const showScreen = (screenId, { skipHistory = false } = {}) => {
 
   if (!skipHistory && typeof window !== "undefined") {
     const targetPath = buildPathForScreen(screenId);
-    if (window.location.pathname !== targetPath) {
+    // Use pushState to allow back button, or replaceState if we want to avoid history clutter
+    // For tabs, replaceState is often better, but hash change naturally adds to history if assigned.
+    // Let's use replaceState to match previous behavior but with hash.
+    if (window.location.hash !== `#/${screenId}` && !(screenId === "inicio" && (!window.location.hash || window.location.hash === "#/"))) {
       window.history.replaceState({ screenId }, "", targetPath);
     }
   }
@@ -210,7 +194,7 @@ const showScreen = (screenId, { skipHistory = false } = {}) => {
   if (screenId === "jimbo") {
     jimboApi.enterJimbo();
   } else if (screenId === "ruleta") {
-    rouletteApi.resetWheel();
+    // rouletteApi.resetWheel(); // Removed as it's not exposed/needed for selector
   } else if (screenId === "lab") {
     imageLabApi.onEnter();
   }
@@ -235,6 +219,7 @@ const applyScreenFromLocation = () => {
 
 if (typeof window !== "undefined") {
   window.addEventListener("popstate", applyScreenFromLocation);
+  window.addEventListener("hashchange", applyScreenFromLocation); // Add hashchange support
   applyScreenFromLocation();
 }
 
@@ -247,6 +232,6 @@ document.addEventListener("keydown", (event) => {
 // Render inicial
 home.render();
 jimboApi.renderPlayerSelector(state.players);
-rouletteApi.renderPlayerOptions(state.players);
+rouletteApi.renderPlayerSelector(state.players);
 
-export {};
+export { };

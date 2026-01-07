@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,6 +12,7 @@
   <link rel="stylesheet" href="css/baba-poly.css">
   <link rel="stylesheet" href="css/navbar.css">
 </head>
+
 <body>
   <div class="app-shell">
     <header id="homeHeader">
@@ -25,7 +27,9 @@
             <button id="addPlayerBtn" class="add-player-btn" type="button">
               <span class="svg-wrapper">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M12 12.5a4 4 0 10-4-4 4 4 0 004 4zm0 1.5c-4.2 0-7.25 2.43-7.25 6.05 0 .53.43.95.96.95h12.58c.53 0 .96-.42.96-.95C19.25 14.93 16.2 14 12 14zM20 8.75h-1.75V7a.75.75 0 10-1.5 0v1.75H15a.75.75 0 100 1.5h1.75V12a.75.75 0 101.5 0v-1.75H20a.75.75 0 000-1.5z"></path>
+                  <path
+                    d="M12 12.5a4 4 0 10-4-4 4 4 0 004 4zm0 1.5c-4.2 0-7.25 2.43-7.25 6.05 0 .53.43.95.96.95h12.58c.53 0 .96-.42.96-.95C19.25 14.93 16.2 14 12 14zM20 8.75h-1.75V7a.75.75 0 10-1.5 0v1.75H15a.75.75 0 100 1.5h1.75V12a.75.75 0 101.5 0v-1.75H20a.75.75 0 000-1.5z">
+                  </path>
                 </svg>
               </span>
               <span>Añadir jugador</span>
@@ -61,7 +65,8 @@
                 <span class="bar-value" id="enemyHealthText"></span>
               </div>
             </div>
-            <img src="assets/mascota.webp" alt="Mascota del jugador" class="battle-character battle-character-player" loading="lazy">
+            <img src="assets/mascota.webp" alt="Mascota del jugador" class="battle-character battle-character-player"
+              loading="lazy">
             <img src="assets/enemigo.gif" alt="Enemigo" class="battle-character battle-character-enemy" loading="lazy">
           </div>
           <div class="battle-panel">
@@ -80,7 +85,8 @@
           </div>
           <h2 id="imageLabTitle" class="section-title">Laboratorio de imágenes</h2>
           <p class="helper-text image-lab-description">
-            Prueba llamadas a tu backend y a la API de Google para depurar la generación de avatares. Esta herramienta sólo se sirve en local; no expongas la clave públicamente.
+            Prueba llamadas a tu backend y a la API de Google para depurar la generación de avatares. Esta herramienta
+            sólo se sirve en local; no expongas la clave públicamente.
           </p>
           <div class="image-lab-grid">
             <form id="imageLabForm" class="image-lab-panel" autocomplete="off">
@@ -119,7 +125,8 @@
                 <input type="url" id="imageLabEndpoint" placeholder="/api/edit-avatar">
 
                 <label for="imageLabAdvancedJson" class="image-lab-label">Campos extra (JSON opcional)</label>
-                <textarea id="imageLabAdvancedJson" rows="4" spellcheck="false" placeholder='{"editConfig":{"referenceSubjectStrength":0.4}}'></textarea>
+                <textarea id="imageLabAdvancedJson" rows="4" spellcheck="false"
+                  placeholder='{"editConfig":{"referenceSubjectStrength":0.4}}'></textarea>
                 <span class="helper-text">Se fusiona con el cuerpo enviado al backend y a Google.</span>
 
                 <label class="image-lab-checkbox">
@@ -136,7 +143,8 @@
                   <label for="imageLabApiKey" class="image-lab-label">Clave de Google</label>
                   <input type="password" id="imageLabApiKey" autocomplete="off" placeholder="AIza...">
                   <span class="helper-text">La clave sólo se usa desde tu navegador. No la compartas.</span>
-                  <button class="btn btn-ghost" type="button" id="imageLabDirectBtn">Llamar a Google directamente</button>
+                  <button class="btn btn-ghost" type="button" id="imageLabDirectBtn">Llamar a Google
+                    directamente</button>
                 </details>
               </fieldset>
             </form>
@@ -162,25 +170,61 @@
 
       <section id="screen-ruleta">
         <h2 class="section-title">Ruleta Baba</h2>
-        <p class="helper-text">
-          Elige un jugador, apuesta una cantidad y selecciona un número. Si aciertas, multiplicas tu dinero. Después de jugar volverás a Inicio con el resultado.
-        </p>
-        <div class="roulette-panel">
-          <div class="card">
-            <label for="roulettePlayer">Jugador</label>
-            <select id="roulettePlayer"></select>
-            <label for="rouletteAmount">Cantidad a apostar</label>
-            <input type="number" id="rouletteAmount" min="10" step="10" value="50">
-            <label for="rouletteNumber">Número (0 - 36)</label>
-            <input type="number" id="rouletteNumber" min="0" max="36" value="7">
-            <button class="btn btn-primary" id="spinBtn">Girar ruleta</button>
-            <span class="helper-text" id="rouletteHelper"></span>
+
+        <!-- Player Selection State -->
+        <div id="rouletteSelect" class="selector-grid"></div>
+
+        <!-- Game State -->
+        <div id="rouletteGame" class="roulette-game" hidden>
+          <div class="roulette-header">
+            <div class="roulette-player-info">
+              <span id="roulettePlayerName" class="player-name-display"></span>
+              <span id="roulettePlayerMoney" class="player-money-display"></span>
+            </div>
+            <button class="btn btn-ghost" id="rouletteExitBtn">Salir</button>
           </div>
-          <div class="roulette-wheel" id="rouletteWheel">
-            <div class="roulette-pointer"></div>
-            <strong id="rouletteResult">?</strong>
+
+          <div class="roulette-container">
+            <!-- Table Container -->
+            <div class="roulette-table-container">
+              <div class="roulette-table" id="rouletteBoard">
+                <!-- Generated by JS -->
+              </div>
+            </div>
           </div>
+
+          <div class="roulette-controls">
+            <div class="chip-selector" id="chipSelector">
+              <button class="chip-btn" data-value="1">1</button>
+              <button class="chip-btn" data-value="5">5</button>
+              <button class="chip-btn" data-value="10">10</button>
+              <button class="chip-btn" data-value="50">50</button>
+              <button class="chip-btn" data-value="100">100</button>
+              <button class="chip-btn" data-value="500">500</button>
+              <button class="chip-btn" data-value="1000">1k</button>
+            </div>
+            <div class="action-controls">
+              <button class="btn btn-secondary" id="clearBetsBtn">Limpiar</button>
+              <button class="btn btn-primary spin-btn" id="spinBtn">RESULTADO</button>
+            </div>
+            <div class="last-results" id="lastResults"></div>
+          </div>
+
+          <div class="roulette-message" id="rouletteMessage"></div>
         </div>
+
+        <!-- Manual Result Modal -->
+        <dialog id="resultModal" class="result-modal">
+          <form method="dialog">
+            <h3>Ingresar Resultado</h3>
+            <div class="number-grid-selector" id="resultSelector">
+              <!-- Generated by JS -->
+            </div>
+            <div class="modal-actions">
+              <button class="btn btn-ghost" value="cancel">Cancelar</button>
+            </div>
+          </form>
+        </dialog>
       </section>
     </main>
   </div>
@@ -198,14 +242,8 @@
           <img class="player-avatar" alt="">
         </div>
       </div>
-      <span
-        class="player-delete-btn"
-        role="button"
-        data-action="delete"
-        title="Eliminar jugador"
-        aria-label="Eliminar jugador"
-        tabindex="-1"
-      >&times;</span>
+      <span class="player-delete-btn" role="button" data-action="delete" title="Eliminar jugador"
+        aria-label="Eliminar jugador" tabindex="-1">&times;</span>
     </button>
   </template>
 
@@ -226,28 +264,32 @@
         <input class="tab-input" type="radio" name="bottom-nav" id="bottom-nav-inicio" data-screen="inicio" checked>
         <label class="tab" for="bottom-nav-inicio" aria-label="Ir a Inicio">
           <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M11.47 2.47a.75.75 0 0 1 1.06 0l8.25 8.25a.75.75 0 0 1-.53 1.28H19.5v7.5a.75.75 0 0 1-.75.75h-4.5a.75.75 0 0 1-.75-.75v-4.5h-2.5v4.5a.75.75 0 0 1-.75.75h-4.5a.75.75 0 0 1-.75-.75V12H3.75a.75.75 0 0 1-.53-1.28l8.25-8.25Z"/>
+            <path
+              d="M11.47 2.47a.75.75 0 0 1 1.06 0l8.25 8.25a.75.75 0 0 1-.53 1.28H19.5v7.5a.75.75 0 0 1-.75.75h-4.5a.75.75 0 0 1-.75-.75v-4.5h-2.5v4.5a.75.75 0 0 1-.75.75h-4.5a.75.75 0 0 1-.75-.75V12H3.75a.75.75 0 0 1-.53-1.28l8.25-8.25Z" />
           </svg>
         </label>
 
         <input class="tab-input" type="radio" name="bottom-nav" id="bottom-nav-jimbo" data-screen="jimbo">
         <label class="tab" for="bottom-nav-jimbo" aria-label="Ir a Jimbo">
           <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <circle cx="6.2" cy="9" r="2.3"/>
-            <circle cx="9.6" cy="5.4" r="2.3"/>
-            <circle cx="14.4" cy="5.4" r="2.3"/>
-            <circle cx="17.8" cy="9" r="2.3"/>
-            <path d="M12 12.2c-3.1 0-5.6 2.5-5.6 5.6 0 1.8 1.4 3.2 3.2 3.2 1 0 1.9-.4 2.6-1 .7.6 1.6 1 2.6 1 1.8 0 3.2-1.4 3.2-3.2 0-3.1-2.5-5.6-5.6-5.6Z"/>
+            <circle cx="6.2" cy="9" r="2.3" />
+            <circle cx="9.6" cy="5.4" r="2.3" />
+            <circle cx="14.4" cy="5.4" r="2.3" />
+            <circle cx="17.8" cy="9" r="2.3" />
+            <path
+              d="M12 12.2c-3.1 0-5.6 2.5-5.6 5.6 0 1.8 1.4 3.2 3.2 3.2 1 0 1.9-.4 2.6-1 .7.6 1.6 1 2.6 1 1.8 0 3.2-1.4 3.2-3.2 0-3.1-2.5-5.6-5.6-5.6Z" />
           </svg>
         </label>
 
         <input class="tab-input" type="radio" name="bottom-nav" id="bottom-nav-ruleta" data-screen="ruleta">
         <label class="tab" for="bottom-nav-ruleta" aria-label="Ir a Ruleta">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.5"/>
-            <circle cx="12" cy="12" r="3" fill="currentColor"/>
-            <path d="M12 3.5V8M20.5 12H16M12 20.5V16M3.5 12H8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-            <path d="M6.2 6.2l3.1 3.1M17.8 6.2l-3.1 3.1M17.8 17.8l-3.1-3.1M6.2 17.8l3.1-3.1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.5" />
+            <circle cx="12" cy="12" r="3" fill="currentColor" />
+            <path d="M12 3.5V8M20.5 12H16M12 20.5V16M3.5 12H8" stroke="currentColor" stroke-width="1.5"
+              stroke-linecap="round" />
+            <path d="M6.2 6.2l3.1 3.1M17.8 6.2l-3.1 3.1M17.8 17.8l-3.1-3.1M6.2 17.8l3.1-3.1" stroke="currentColor"
+              stroke-width="1.5" stroke-linecap="round" />
           </svg>
         </label>
 
@@ -258,4 +300,5 @@
 
   <script type="module" src="js/main.js"></script>
 </body>
+
 </html>
