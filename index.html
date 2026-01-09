@@ -5,6 +5,27 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Baba Poly</title>
+  <!-- Auto-detect base path for GitHub Pages -->
+  <script>
+    (function () {
+      // Only set base tag if we're on GitHub Pages with a repository path
+      // AND assets are failing to load (indicated by pathname !== '/')
+      var pathSegments = window.location.pathname.split('/').filter(Boolean);
+
+      // Only add base if:
+      // 1. We have a path segment (repo name)
+      // 2. It's not an HTML file
+      // 3. We're on github.io domain OR the path suggests GitHub Pages structure
+      if (pathSegments.length > 0 &&
+        !pathSegments[0].match(/\.html?$/) &&
+        (location.hostname.includes('github.io') || location.hostname.includes('github'))) {
+        var basePath = '/' + pathSegments[0] + '/';
+        var base = document.createElement('base');
+        base.href = basePath;
+        document.head.appendChild(base);
+      }
+    })();
+  </script>
   <!-- GitHub Pages SPA redirect handler -->
   <script>
     (function () {
