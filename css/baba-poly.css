@@ -1832,24 +1832,30 @@ textarea:focus {
 }
 
 .battle-stage {
-  display: grid;
-  gap: clamp(1.4rem, 4vw, 2rem);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
 }
 
 .battle-scene {
   position: relative;
   margin: 0 auto;
-  width: min(620px, 100%);
-  border-radius: 32px;
+  width: 100%;
+  max-width: 620px;
+  aspect-ratio: 16 / 10;
+  min-height: 240px;
+  border-radius: 24px;
   overflow: hidden;
   background: radial-gradient(circle at top, rgba(8, 12, 28, 0.6), rgba(8, 12, 28, 0.85));
-  box-shadow: 0 28px 50px -34px rgba(8, 12, 28, 0.9);
+  box-shadow: 0 20px 40px -20px rgba(8, 12, 28, 0.8);
 }
 
 .battle-scene img:not(.battle-character) {
   display: block;
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: cover;
   image-rendering: pixelated;
 }
 
@@ -1982,6 +1988,7 @@ textarea:focus {
 .battle-character-enemy {
   right: 21%;
   bottom: 39%;
+  transform: scaleX(-1);
 }
 
 .battle-character.attack-player {

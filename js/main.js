@@ -1,8 +1,8 @@
-import { state } from "./state.js";
-import { initHome } from "./home.js";
-import { initJimbo } from "./jimbo.js";
-import { initRoulette } from "./roulette.js";
-import { initImageLab } from "./image-lab.js";
+import { state } from "./state.js?v=2";
+import { initHome } from "./home.js?v=2";
+import { initJimbo } from "./jimbo.js?v=2";
+import { initRoulette } from "./roulette.js?v=2";
+import { initImageLab } from "./image-lab.js?v=2";
 
 const screens = {
   inicio: document.getElementById("screen-inicio"),

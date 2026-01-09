@@ -9,12 +9,16 @@ const ATTACKS = [
   { level: 5, name: "Explosión polimorfa", min: 32, max: 46 },
 ];
 
-const ENEMY_NAMES = [
-  "Caracol Punk",
-  "Hongo Loco",
-  "Foca Ninja",
-  "Blob Galáctico",
-  "Robot Cascarrabias",
+const ENEMIES = [
+  { name: "Bannette", sprite: "assets/bannete.gif" },
+  { name: "Blastoise", sprite: "assets/blastoise.gif" },
+  { name: "Giratina", sprite: "assets/giratina.gif" },
+  { name: "Haunter", sprite: "assets/haunter.gif" },
+  { name: "Mewtwo", sprite: "assets/mewtwo.gif" },
+  { name: "Scyther", sprite: "assets/scyder.gif" },
+  { name: "Sneasel", sprite: "assets/sneasel.gif" },
+  { name: "Totodile", sprite: "assets/totodile-pokemon.gif" },
+  { name: "Vaporeon", sprite: "assets/vaporeon.gif" },
 ];
 
 const getAvailableAttacks = (level) =>
@@ -41,7 +45,7 @@ export const initJimbo = ({
 }) => {
   let battleState = null;
 
-  const appendLog = () => {};
+  const appendLog = () => { };
 
   const playSpriteAnimation = (element, className) => {
     if (!element) return;
@@ -206,10 +210,14 @@ export const initJimbo = ({
   const startBattle = (playerId) => {
     const player = getPlayerById(playerId);
     if (!player) return;
+
     const petLevel = player.pet.level;
     const playerMaxHp = 60 + petLevel * 20;
     const enemyLevel = Math.max(1, petLevel + randomBetween(-1, 1));
     const enemyMaxHp = 60 + enemyLevel * 18;
+
+    // Pick a random enemy from our Pokemon list
+    const randomEnemy = ENEMIES[Math.floor(Math.random() * ENEMIES.length)];
 
     battleState = {
       playerId,
@@ -218,17 +226,26 @@ export const initJimbo = ({
       enemyHp: enemyMaxHp,
       enemyMaxHp,
       enemyLevel,
-      enemyName: ENEMY_NAMES[Math.floor(Math.random() * ENEMY_NAMES.length)],
+      enemyName: randomEnemy.name,
       turn: "player",
       locked: false,
     };
 
     playerSelectContainer.hidden = true;
     battleStage.hidden = false;
+
+    // Update UI with names and levels
     playerPetLabel.textContent = player.name;
     if (playerLevelLabel) playerLevelLabel.textContent = petLevel;
     enemyLabel.textContent = battleState.enemyName;
     if (enemyLevelLabel) enemyLevelLabel.textContent = enemyLevel;
+
+    // Update enemy sprite correctly
+    if (enemyCharacter) {
+      enemyCharacter.src = randomEnemy.sprite;
+      enemyCharacter.alt = randomEnemy.name;
+    }
+
     updateHealthBars();
     renderAttacks(petLevel);
     appendLog(`¡${player.name} entra en combate!`);

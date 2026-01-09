@@ -104,9 +104,11 @@
                 <span class="bar-value" id="enemyHealthText"></span>
               </div>
             </div>
-            <img src="assets/mascota.webp" alt="Mascota del jugador" class="battle-character battle-character-player"
+            <!-- Characters with dynamic sources -->
+            <img src="assets/mascota.webp" alt="Mascota" class="battle-character battle-character-player"
               loading="lazy">
-            <img src="assets/enemigo.gif" alt="Enemigo" class="battle-character battle-character-enemy" loading="lazy">
+            <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="Enemigo"
+              class="battle-character battle-character-enemy" loading="lazy">
           </div>
           <div class="battle-panel">
             <div id="attackGrid" class="attack-grid"></div>
@@ -337,7 +339,7 @@
     </div>
   </nav>
 
-  <script type="module" src="js/main.js"></script>
+  <script type="module" src="js/main.js?v=2"></script>
 </body>
 
 </html>
