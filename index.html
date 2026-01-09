@@ -8,10 +8,18 @@
   <!-- GitHub Pages SPA redirect handler -->
   <script>
     (function () {
-      var redirect = sessionStorage.redirect;
-      delete sessionStorage.redirect;
+      var redirect = sessionStorage.getItem('redirect');
+      sessionStorage.removeItem('redirect');
       if (redirect && redirect !== location.href) {
-        history.replaceState(null, null, redirect);
+        // Extract the hash from the redirected URL if it exists
+        var hashMatch = redirect.match(/#.*/);
+        if (hashMatch) {
+          // Restore with hash routing
+          history.replaceState(null, null, hashMatch[0]);
+        } else {
+          // Fallback to full URL restore
+          history.replaceState(null, null, redirect);
+        }
       }
     })();
   </script>

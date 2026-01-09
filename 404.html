@@ -6,11 +6,22 @@
     <title>Baba Poly - Redirecting...</title>
     <script>
         // GitHub Pages SPA redirect script
-        // Store the current path in sessionStorage and redirect to index.html
-        // The index.html will restore the path from sessionStorage
-        sessionStorage.redirect = location.href;
+        // https://ctrl-strawberry.github.io/babapoly/#/jimbo
+        // becomes stored in sessionStorage, then redirects to root
+        sessionStorage.setItem('redirect', location.href);
+
+        // Determine the base path (handle both user.github.io/repo and user.github.io scenarios)
+        var pathSegments = location.pathname.split('/').filter(Boolean);
+        var basePath = '/';
+
+        // If there's a repo name (not user.github.io root), include it
+        if (pathSegments.length > 0 && !location.pathname.match(/\.html?$/)) {
+            basePath = '/' + pathSegments[0] + '/';
+        }
+
+        // Redirect immediately to the base path
+        location.replace(basePath);
     </script>
-    <meta http-equiv="refresh" content="0;URL='/'">
 </head>
 
 <body>

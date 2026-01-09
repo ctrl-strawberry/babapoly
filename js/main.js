@@ -53,6 +53,16 @@ const rouletteExitBtn = document.getElementById("rouletteExitBtn");
 const lastResults = document.getElementById("lastResults");
 
 const deriveBasePath = () => {
+  // Auto-detect base path for GitHub Pages
+  // If deployed to user.github.io/repo, pathname will be /repo/
+  // If deployed to user.github.io, pathname will be /
+  const pathSegments = window.location.pathname.split('/').filter(Boolean);
+
+  // If there's a segment that looks like a repo name (not index.html), use it
+  if (pathSegments.length > 0 && !pathSegments[0].match(/\.html?$/)) {
+    return `/${pathSegments[0]}/`;
+  }
+
   return "/";
 };
 
