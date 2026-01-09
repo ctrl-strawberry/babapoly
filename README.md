@@ -34,6 +34,29 @@ Aplicación web single-page para gestionar jugadores y minijuegos de una versió
 2. **Jimbo**: seleccionar jugador, combatir contra enemigos generados según nivel; volverá a Inicio mostrando la animación de dinero.
 3. **Ruleta**: escoger jugador, apuesta y número; tras el giro se vuelve a Inicio con el resultado.
 
+## Despliegue en GitHub Pages
+
+Esta aplicación está configurada para funcionar correctamente en GitHub Pages con **hash routing** (`#/ruleta`, `#/jimbo`, etc.).
+
+### Configuración incluida
+
+- **404.html**: Redirige automáticamente a `index.html` cuando se recarga la página
+- **.nojekyll**: Desactiva el procesamiento de Jekyll en GitHub Pages
+- **Script de redirección**: Preserva la ruta actual al recargar usando `sessionStorage`
+
+### Pasos para desplegar
+
+1. Sube los cambios a tu repositorio
+   ```bash
+   git add .
+   git commit -m "Fix GitHub Pages SPA routing"
+   git push
+   ```
+2. Activa GitHub Pages en Settings → Pages → Source: rama `main` (o `gh-pages`)
+3. La aplicación estará disponible en `https://tu-usuario.github.io/tu-repo/`
+
+**Nota**: Los cambios pueden tardar unos minutos en reflejarse después del push.
+
 ## Backend ligero para el avatar IA
 
 La clave de Google Gemini **no** debe vivir en el frontend. Para mantener GitHub Pages y proteger el secreto puedes desplegar un Worker (por ejemplo en Cloudflare). En este repositorio encontrarás un ejemplo en `server/cloudflare-edit-avatar.js`.

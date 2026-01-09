@@ -5,6 +5,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Baba Poly</title>
+  <!-- GitHub Pages SPA redirect handler -->
+  <script>
+    (function () {
+      var redirect = sessionStorage.redirect;
+      delete sessionStorage.redirect;
+      if (redirect && redirect !== location.href) {
+        history.replaceState(null, null, redirect);
+      }
+    })();
+  </script>
   <script>
     window.BABA_POLY_AVATAR_ENDPOINT = "https://baba-poly-worker.babapoly.workers.dev/api/edit-avatar";
   </script>
