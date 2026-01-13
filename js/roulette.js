@@ -23,6 +23,8 @@ export const initRoulette = ({
   chipSelector,
   spinBtn,
   clearBetsBtn,
+  undoBtn,
+  redoBtn,
   rouletteExitBtn,
   lastResults,
   playerSelectTemplate,
@@ -34,6 +36,8 @@ export const initRoulette = ({
   let currentBets = {}; // { "number-17": 100, "color-red": 50, "dozen-1": 20 }
   let selectedChipValue = 50;
   let recentResults = [];
+  let undoStack = [];
+  let redoStack = [];
 
   // --- Initialization & Navigation ---
 
@@ -252,8 +256,55 @@ export const initRoulette = ({
     if (!currentBets[betId]) currentBets[betId] = 0;
     currentBets[betId] += selectedChipValue;
 
+    pushToHistory(betId, selectedChipValue);
     addChipVisual(betId);
     updateMessage(`Apuesta total: ${formatMoney(Object.values(currentBets).reduce((a, b) => a + b, 0))}`);
+  };
+
+  const pushToHistory = (betId, amount) => {
+    undoStack.push({ betId, amount });
+    redoStack = []; // Clear redo when a new action is performed
+    updateHistoryButtons();
+  };
+
+  const undo = () => {
+    if (undoStack.length === 0) return;
+    const action = undoStack.pop();
+    redoStack.push(action);
+
+    if (currentBets[action.betId]) {
+      currentBets[action.betId] -= action.amount;
+      if (currentBets[action.betId] <= 0) {
+        delete currentBets[action.betId];
+      }
+      addChipVisual(action.betId);
+    }
+
+    updateTotalMessage();
+    updateHistoryButtons();
+  };
+
+  const redo = () => {
+    if (redoStack.length === 0) return;
+    const action = redoStack.pop();
+    undoStack.push(action);
+
+    if (!currentBets[action.betId]) currentBets[action.betId] = 0;
+    currentBets[action.betId] += action.amount;
+
+    addChipVisual(action.betId);
+    updateTotalMessage();
+    updateHistoryButtons();
+  };
+
+  const updateHistoryButtons = () => {
+    undoBtn.disabled = undoStack.length === 0;
+    redoBtn.disabled = redoStack.length === 0;
+  };
+
+  const updateTotalMessage = () => {
+    const total = Object.values(currentBets).reduce((a, b) => a + b, 0);
+    updateMessage(total > 0 ? `Apuesta total: ${formatMoney(total)}` : "Hagan sus apuestas");
   };
 
   const addChipVisual = (betId) => {
@@ -294,22 +345,26 @@ export const initRoulette = ({
 
     if (!targetCell) return;
 
-    // Check if chip exists for this SPECIFIC betId
-    // We can't just query .chip inside the cell because a cell might have multiple chips (center, top, right...)
-    // So we need to identify the chip by betId too.
+    // Remove existing chip if it exists for this SPECIFIC betId
     let chip = null;
     const existingChips = targetCell.querySelectorAll(".chip");
     existingChips.forEach(c => {
       if (c.dataset.betId === betId) chip = c;
     });
 
+    const cellTotal = currentBets[betId] || 0;
+
+    if (cellTotal <= 0) {
+      if (chip) chip.remove();
+      return;
+    }
+
     if (!chip) {
       chip = document.createElement("div");
-      chip.dataset.betId = betId; // Store betId on chip to distinguish
+      chip.dataset.betId = betId;
       targetCell.appendChild(chip);
     }
 
-    const cellTotal = currentBets[betId];
     chip.textContent = cellTotal >= 1000 ? `${(cellTotal / 1000).toFixed(1)}k` : cellTotal;
 
     chip.className = `chip ${positionClass}`;
@@ -324,8 +379,11 @@ export const initRoulette = ({
 
   const clearBets = () => {
     currentBets = {};
+    undoStack = [];
+    redoStack = [];
     document.querySelectorAll(".chip").forEach(c => c.remove());
     updateMessage("Hagan sus apuestas");
+    updateHistoryButtons();
   };
 
   // --- Result Handling ---
@@ -482,10 +540,26 @@ export const initRoulette = ({
 
   spinBtn.addEventListener("click", openResultModal);
   clearBetsBtn.addEventListener("click", clearBets);
+  undoBtn.addEventListener("click", undo);
+  redoBtn.addEventListener("click", redo);
   rouletteExitBtn.addEventListener("click", exitGame);
+
+  // Keyboard Shortcuts
+  window.addEventListener("keydown", (e) => {
+    if (rouletteGame.hidden) return;
+
+    if (e.ctrlKey && e.key === "z") {
+      e.preventDefault();
+      undo();
+    } else if (e.ctrlKey && (e.key === "y" || (e.shiftKey && e.key === "Z"))) {
+      e.preventDefault();
+      redo();
+    }
+  });
 
   // Set default chip
   chipSelector.querySelector('[data-value="50"]').classList.add("active");
+  updateHistoryButtons();
 
   return {
     renderPlayerSelector,

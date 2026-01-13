@@ -50,6 +50,8 @@ const chipSelector = document.getElementById("chipSelector");
 const spinBtn = document.getElementById("spinBtn");
 const clearBetsBtn = document.getElementById("clearBetsBtn");
 const rouletteExitBtn = document.getElementById("rouletteExitBtn");
+const undoBtn = document.getElementById("undoBtn");
+const redoBtn = document.getElementById("redoBtn");
 const lastResults = document.getElementById("lastResults");
 
 const deriveBasePath = () => {
@@ -150,6 +152,8 @@ rouletteApi = initRoulette({
   chipSelector,
   spinBtn,
   clearBetsBtn,
+  undoBtn,
+  redoBtn,
   rouletteExitBtn,
   lastResults,
   playerSelectTemplate,

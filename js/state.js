@@ -186,6 +186,16 @@ export const addToPot = (amount) => {
   return state.pot;
 };
 
+export const takePot = (playerId) => {
+  const player = getPlayerById(playerId);
+  if (!player) return null;
+  const amount = state.pot || 0;
+  player.money += amount;
+  state.pot = 0;
+  saveState();
+  return amount;
+};
+
 export const getCreatedPlayerById = (id) =>
   state.createdPlayers.find((player) => player.id === id);
 

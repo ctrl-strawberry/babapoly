@@ -8,6 +8,7 @@ import {
   upsertCreatedPlayer,
   removeCreatedPlayer,
   isPlayerActive,
+  takePot,
 } from "./state.js";
 import { formatMoney, readFileAsBase64, toDataUrl } from "./utils.js";
 
@@ -158,9 +159,9 @@ export const initHome = ({
   playerCardTemplate,
   modalContainer,
   bottomNav,
-  onPlayersUpdated = () => {},
+  onPlayersUpdated = () => { },
 }) => {
-  const transferState = { from: null, to: null };
+  const transferState = { from: null, to: null, prizeMode: false };
   let editingMode = false;
   let activeModal = null;
   let potAmountNodeRef = null;
@@ -249,9 +250,13 @@ export const initHome = ({
   const clearTransferSelection = () => {
     transferState.from = null;
     transferState.to = null;
+    transferState.prizeMode = false;
     playerList
       .querySelectorAll(".player-card.selected")
       .forEach((card) => card.classList.remove("selected"));
+    playerList
+      .querySelectorAll(".player-card.prize-mode-active")
+      .forEach((card) => card.classList.remove("prize-mode-active"));
   };
 
   const closeModal = () => {
@@ -436,6 +441,50 @@ export const initHome = ({
       amountInput.select();
       amountInput.scrollIntoView({ block: "center" });
     });
+  };
+
+  const openPrizeModal = (playerId) => {
+    const player = getPlayerById(playerId);
+    if (!player) return;
+
+    const potAmount = state.pot || 0;
+    if (potAmount <= 0) return;
+
+    closeModal();
+
+    const modal = document.createElement("div");
+    modal.className = "modal-backdrop";
+    modal.innerHTML = `
+      <div class="prize-modal" role="dialog" aria-modal="true">
+        <h2 class="prize-title">¡PREMIO!</h2>
+        <div class="prize-amount">${formatMoney(potAmount)}</div>
+        <p class="prize-winner">Felicidades <strong>${player.name}</strong>, el contenido del bote es tuyo.</p>
+        <div class="modal-actions" style="justify-content: center; margin-top: 1rem;">
+          <button class="btn-prize" type="button" data-action="confirm">ACEPTAR</button>
+        </div>
+      </div>
+    `;
+
+    modal.querySelector("[data-action='confirm']").addEventListener("click", () => {
+      const amount = takePot(playerId);
+      closeModal();
+      renderPlayers();
+      if (amount > 0) {
+        showMoneyAnimation(playerId, amount);
+      }
+    });
+
+    modal.addEventListener("click", (event) => {
+      if (event.target === modal) {
+        // En este modal de gloria, quizás es mejor no cerrarlo por error clicando fuera
+        // pero por consistencia lo dejamos.
+        closeModal();
+      }
+    });
+
+    modalContainer.appendChild(modal);
+    activeModal = modal;
+    setBottomNavHidden(true);
   };
 
   const openAddPlayerModal = () => {
@@ -735,8 +784,8 @@ export const initHome = ({
       const selectedPlayer =
         selectedCreatedPlayerId != null
           ? availablePlayers.find(
-              (player) => player.id === selectedCreatedPlayerId,
-            ) ?? null
+            (player) => player.id === selectedCreatedPlayerId,
+          ) ?? null
           : null;
 
       if (!selectedPlayer) {
@@ -1072,11 +1121,33 @@ export const initHome = ({
 
   const handlePlayerClick = (node, playerId) => {
     if (isPot(playerId)) {
-      clearTransferSelection();
+      if (transferState.from) {
+        return;
+      }
+
+      const potAmount = state.pot || 0;
+      if (potAmount <= 0) {
+        // En lugar de alert, vamos a dejar que se active pero daremos un aviso visual o log
+        console.log("El bote está vacío.");
+        return;
+      }
+
+      if (transferState.prizeMode) {
+        clearTransferSelection();
+      } else {
+        transferState.prizeMode = true;
+        node.classList.add("prize-mode-active");
+      }
       return;
     }
 
     if (editingMode) {
+      return;
+    }
+
+    if (transferState.prizeMode) {
+      if (isBank(playerId)) return;
+      openPrizeModal(playerId);
       return;
     }
 
@@ -1139,10 +1210,23 @@ export const initHome = ({
       }
       potMoneyNode.classList.add("pot-card-amount");
     }
+
+    // Add bubble wrapper to pot card
+    const aura = document.createElement("div");
+    aura.className = "pot-aura-wrapper";
+    // Create 3 complex bubbles
+    for (let i = 0; i < 3; i++) {
+      const bubble = document.createElement("div");
+      bubble.className = "bubble";
+      bubble.innerHTML = "<span></span><span></span><span></span><span></span><span></span>";
+      aura.appendChild(bubble);
+    }
+    potCard.appendChild(aura);
+
+    potCard.addEventListener("click", () => handlePlayerClick(potCard, POT_PLAYER_ID));
+
     potCard.querySelector(".player-card-visual")?.remove();
     potCard.querySelector("[data-action='delete']")?.remove();
-    potCard.disabled = true;
-    potCard.classList.add("is-static");
 
     const bankPotRow = document.createElement("div");
     bankPotRow.classList.add("bank-pot-row");
