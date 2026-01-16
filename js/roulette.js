@@ -102,62 +102,23 @@ export const initRoulette = ({
 
   // --- Board Rendering ---
 
-  const renderBoard = () => {
-    rouletteBoard.innerHTML = "";
+  // Persistent overlay for hotspots
+  let boardOverlay = null;
 
-    // Create Overlay Container
-    const overlay = document.createElement("div");
-    overlay.className = "roulette-overlay";
-    rouletteBoard.appendChild(overlay);
-
-    // 0
-    rouletteBoard.appendChild(createCell(0, "0", "green", "cell-0", "number-0"));
-
-    // Numbers 1-36
-    for (let i = 1; i <= 36; i++) {
-      const color = getNumberColor(i);
-      // Revert to standard click handler for straight bets
-      const cell = createCell(i, i.toString(), color, "cell-number", `number-${i}`);
-
-      const col = Math.ceil(i / 3) + 1;
-      const row = 3 - ((i - 1) % 3);
-
-      cell.style.gridColumn = col;
-      cell.style.gridRow = row;
-      rouletteBoard.appendChild(cell);
-    }
-
-    // 2 to 1 (Columns)
-    rouletteBoard.appendChild(createSpecialCell("2 to 1", "cell-2to1", 14, 1, "column-1"));
-    rouletteBoard.appendChild(createSpecialCell("2 to 1", "cell-2to1", 14, 2, "column-2"));
-    rouletteBoard.appendChild(createSpecialCell("2 to 1", "cell-2to1", 14, 3, "column-3"));
-
-    // Dozens
-    rouletteBoard.appendChild(createSpecialCell("1st 12", "cell-dozen", "2 / span 4", 4, "dozen-1"));
-    rouletteBoard.appendChild(createSpecialCell("2nd 12", "cell-dozen", "6 / span 4", 4, "dozen-2"));
-    rouletteBoard.appendChild(createSpecialCell("3rd 12", "cell-dozen", "10 / span 4", 4, "dozen-3"));
-
-    // Outside Bets
-    rouletteBoard.appendChild(createSpecialCell("1-18", "cell-outside", "2 / span 2", 5, "low"));
-    rouletteBoard.appendChild(createSpecialCell("EVEN", "cell-outside", "4 / span 2", 5, "even"));
-    rouletteBoard.appendChild(createSpecialCell("", "cell-outside cell-diamond-red", "6 / span 2", 5, "color-red"));
-    rouletteBoard.appendChild(createSpecialCell("", "cell-outside cell-diamond-black", "8 / span 2", 5, "color-black"));
-    rouletteBoard.appendChild(createSpecialCell("ODD", "cell-outside", "10 / span 2", 5, "odd"));
-    rouletteBoard.appendChild(createSpecialCell("19-36", "cell-outside", "12 / span 2", 5, "high"));
-
-    // Render Overlays after a short delay to ensure layout is computed
-    setTimeout(() => renderOverlays(overlay), 100);
-  };
-
-  const renderOverlays = (overlay) => {
+  const renderOverlays = () => {
+    if (!boardOverlay || rouletteGame.hidden) return;
+    const overlay = boardOverlay;
     overlay.innerHTML = "";
+
+    const boardWidth = rouletteBoard.offsetWidth;
+    if (boardWidth === 0) return; // Not visible yet
 
     // Iterate numbers to create hotspots
     for (let i = 1; i <= 36; i++) {
       const cell = rouletteBoard.querySelector(`[data-bet-id="number-${i}"]`);
       if (!cell) continue;
 
-      // Relative positions
+      // Layout positions (pre-transform)
       const top = cell.offsetTop;
       const left = cell.offsetLeft;
       const width = cell.offsetWidth;
@@ -210,11 +171,65 @@ export const initRoulette = ({
     spot.style.width = `${width}px`;
     spot.style.height = `${height}px`;
     spot.addEventListener("click", (e) => {
-      e.stopPropagation(); // Prevent clicking the number below
+      e.stopPropagation();
       placeBet(betId);
     });
     container.appendChild(spot);
   };
+
+  const renderBoard = () => {
+    rouletteBoard.innerHTML = "";
+
+    // Create persistent Overlay Container if it doesn't exist
+    boardOverlay = document.createElement("div");
+    boardOverlay.className = "roulette-overlay";
+    rouletteBoard.appendChild(boardOverlay);
+
+    // 0
+    rouletteBoard.appendChild(createCell(0, "0", "green", "cell-0", "number-0"));
+
+    // Numbers 1-36
+    for (let i = 1; i <= 36; i++) {
+      const color = getNumberColor(i);
+      const cell = createCell(i, i.toString(), color, "cell-number", `number-${i}`);
+
+      const col = Math.ceil(i / 3) + 1;
+      const row = 3 - ((i - 1) % 3);
+
+      cell.style.gridColumn = col;
+      cell.style.gridRow = row;
+      rouletteBoard.appendChild(cell);
+    }
+
+    // 2 to 1 (Columns)
+    rouletteBoard.appendChild(createSpecialCell("2 to 1", "cell-2to1", 14, 1, "column-1"));
+    rouletteBoard.appendChild(createSpecialCell("2 to 1", "cell-2to1", 14, 2, "column-2"));
+    rouletteBoard.appendChild(createSpecialCell("2 to 1", "cell-2to1", 14, 3, "column-3"));
+
+    // Dozens
+    rouletteBoard.appendChild(createSpecialCell("1st 12", "cell-dozen", "2 / span 4", 4, "dozen-1"));
+    rouletteBoard.appendChild(createSpecialCell("2nd 12", "cell-dozen", "6 / span 4", 4, "dozen-2"));
+    rouletteBoard.appendChild(createSpecialCell("3rd 12", "cell-dozen", "10 / span 4", 4, "dozen-3"));
+
+    // Outside Bets
+    rouletteBoard.appendChild(createSpecialCell("1-18", "cell-outside", "2 / span 2", 5, "low"));
+    rouletteBoard.appendChild(createSpecialCell("EVEN", "cell-outside", "4 / span 2", 5, "even"));
+    rouletteBoard.appendChild(createSpecialCell("", "cell-outside cell-diamond-red", "6 / span 2", 5, "color-red"));
+    rouletteBoard.appendChild(createSpecialCell("", "cell-outside cell-diamond-black", "8 / span 2", 5, "color-black"));
+    rouletteBoard.appendChild(createSpecialCell("ODD", "cell-outside", "10 / span 2", 5, "odd"));
+    rouletteBoard.appendChild(createSpecialCell("19-36", "cell-outside", "12 / span 2", 5, "high"));
+
+    // Initial overlay render
+    requestAnimationFrame(() => renderOverlays());
+  };
+
+  // Resize listener to re-align hotspots
+  const boardResizeObserver = new ResizeObserver(() => {
+    if (!rouletteGame.hidden) {
+      renderOverlays();
+    }
+  });
+  boardResizeObserver.observe(rouletteBoard);
 
   const createCell = (id, label, color, className, betId, onClick = null) => {
     const cell = document.createElement("div");
