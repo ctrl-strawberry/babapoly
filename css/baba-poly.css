@@ -3226,3 +3226,48 @@ textarea:focus {
     transform: rotate(360deg);
   }
 }
+
+/* Landscape optimization for Roulette */
+@media (max-height: 500px) and (orientation: landscape) {
+
+  /* Hide bottom nav specifically when roulette is active */
+  body[data-active-screen="ruleta"] .bottom-nav {
+    display: none !important;
+  }
+
+  /* Reduce main padding to maximize game area */
+  body[data-active-screen="ruleta"] main {
+    padding-inline: 0.25rem;
+    padding-top: 0.25rem;
+    padding-bottom: 0px;
+  }
+
+  /* Make the roulette table fit better without cropping */
+  body[data-active-screen="ruleta"] .roulette-table-container {
+    padding: 10px 15px;
+    border-width: 4px;
+    min-width: unset;
+    /* Allow it to shrink to fit screen */
+    width: 100%;
+    border-radius: 40px;
+  }
+
+  /* Adjust the game container to be more compact */
+  body[data-active-screen="ruleta"] .roulette-game {
+    gap: 0.5rem;
+    padding-top: 0.5rem;
+  }
+
+  /* Slightly scale down the grid to ensure it fits the width */
+  body[data-active-screen="ruleta"] .roulette-table {
+    transform: scale(0.92);
+    transform-origin: center top;
+    margin: 0 auto;
+  }
+
+  /* Compact chips and chips selector in landscape */
+  body[data-active-screen="ruleta"] .chip-selector {
+    transform: scale(0.8);
+    margin-bottom: -5px;
+  }
+}

@@ -183,6 +183,7 @@ let currentScreen = "inicio";
 const showScreen = (screenId, { skipHistory = false } = {}) => {
   if (!screens[screenId]) return;
   currentScreen = screenId;
+  document.body.dataset.activeScreen = screenId;
 
   Object.entries(screens).forEach(([id, section]) => {
     section.classList.toggle("active", id === screenId);
