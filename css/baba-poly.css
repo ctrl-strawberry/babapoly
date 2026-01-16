@@ -133,7 +133,7 @@ main {
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 0 clamp(1.5rem, 4vw, 2.5rem) calc(clamp(2rem, 5vw, 3rem) + 5rem);
+  padding: clamp(1rem, 3vw, 2rem) clamp(1.5rem, 4vw, 2.5rem) calc(clamp(2rem, 5vw, 3rem) + 5rem);
   overflow-y: auto;
   position: relative;
 }
@@ -170,6 +170,61 @@ section.active {
   align-items: center;
   width: 100%;
   position: relative;
+  padding: 1.25rem;
+  z-index: 100;
+  border-bottom: 1px solid rgba(124, 130, 170, 0.12);
+}
+
+.header-nav-container {
+  display: grid;
+  grid-template-rows: auto 0fr;
+  align-items: center;
+  justify-items: center;
+  width: 100%;
+  position: relative;
+  transition: grid-template-rows 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.header-nav-container.is-active {
+  grid-template-rows: auto 1fr;
+}
+
+.settings-menu-reveal {
+  background: var(--nav-bg);
+  color: var(--text);
+  border-radius: 60px;
+  box-shadow: var(--nav-shadow);
+  border: 1px solid var(--card-border);
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  width: fit-content;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  min-height: 0;
+
+  /* Circular reveal starting from top center (under the title) */
+  -webkit-clip-path: circle(0% at 50% 0%);
+  clip-path: circle(0% at 50% 0%);
+  opacity: 0;
+  transform: translateY(-20px);
+  pointer-events: none;
+}
+
+.header-nav-container.is-active .settings-menu-reveal {
+  margin-top: 1rem;
+  -webkit-clip-path: circle(100% at 50% 50%);
+  clip-path: circle(100% at 50% 50%);
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.player-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 8px 20px;
 }
 
 .image-lab {
@@ -392,37 +447,30 @@ section.active {
 
 .settings-terminal-btn {
   display: inline-flex;
-  align-items: baseline;
-  gap: 0.35rem;
-  padding: 0.5rem 0;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.4rem 0;
   border: none;
   background: none;
   cursor: pointer;
-  color: #111;
-  font-weight: 700;
   transition: transform 0.2s ease;
   position: relative;
-  isolation: isolate;
-}
-
-.settings-terminal-btn:focus-visible {
-  outline: 3px solid rgba(102, 166, 255, 0.75);
-  outline-offset: 6px;
+  flex-shrink: 0;
 }
 
 .terminal-title {
-  font-family: "JetBrains Mono", "Fira Code", "SFMono-Regular", "Courier New", monospace;
-  font-size: clamp(2rem, 4vw, 2.75rem);
-  font-weight: 700;
-  letter-spacing: 0.35rem;
+  font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-size: clamp(1.2rem, 3vw, 1.8rem);
+  font-weight: 800;
+  letter-spacing: 0.15rem;
   color: var(--text);
   text-transform: uppercase;
 }
 
 .terminal-cursor {
   font-family: inherit;
-  font-size: clamp(2rem, 4vw, 2.75rem);
-  background: linear-gradient(120deg, #1e3a8a, #6366f1, #9333ea);
+  font-size: clamp(1.2rem, 3vw, 1.8rem);
+  background: linear-gradient(120deg, var(--primary), var(--primary-alt));
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
@@ -430,23 +478,7 @@ section.active {
 }
 
 .settings-terminal-btn:hover {
-  transform: translateY(-2px);
-}
-
-.settings-terminal-btn.active::after {
-  content: "";
-  position: absolute;
-  inset: -8px;
-  border-radius: 18px;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.36), rgba(99, 102, 241, 0));
-  filter: blur(0);
-  opacity: 0.85;
-  z-index: -1;
-  animation: gentle-pulse 2.8s ease-in-out infinite;
-}
-
-.settings-terminal-btn.active {
-  animation: none;
+  transform: scale(1.02);
 }
 
 #screen-inicio {
@@ -514,68 +546,48 @@ section.active {
   }
 }
 
-.player-toolbar {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 1.5rem;
-}
-
 .add-player-btn {
   font-family: inherit;
-  font-size: 1.05rem;
+  font-size: 0.85rem;
   background: linear-gradient(to bottom, #4dc7d9 0%, #66a6ff 100%);
   color: #fff;
-  padding: 0.9rem 1.6rem;
+  padding: 0.5rem 1rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border: none;
-  border-radius: 25px;
-  box-shadow: 0 12px 24px -14px rgba(0, 0, 0, 0.45);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px -4px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .add-player-btn .svg-wrapper {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   background-color: rgba(255, 255, 255, 0.2);
-  margin-right: 0.65rem;
+  margin-right: 0.5rem;
   transition: background-color 0.3s ease;
 }
 
 .add-player-btn svg {
-  width: 20px;
-  height: 20px;
+  width: 14px;
+  height: 14px;
   fill: #fff;
-  transition: transform 0.3s ease;
-}
-
-.add-player-btn span:last-child {
-  transition: letter-spacing 0.3s ease;
 }
 
 .add-player-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 18px 30px -18px rgba(0, 0, 0, 0.55);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px -6px rgba(0, 0, 0, 0.4);
 }
 
-.add-player-btn:hover .svg-wrapper {
-  background-color: rgba(255, 255, 255, 0.45);
-}
-
-.add-player-btn:hover svg {
-  transform: rotate(15deg);
-}
-
-.add-player-btn:active {
-  transform: scale(0.96);
-  box-shadow: 0 6px 18px -12px rgba(0, 0, 0, 0.45);
+.add-player-btn.reset-btn {
+  background: linear-gradient(to bottom, #ff5470 0%, #ff2d88 100%);
 }
 
 .player-list {
@@ -1025,7 +1037,7 @@ section.active {
   align-items: center;
   padding: 1.5rem;
   backdrop-filter: blur(6px);
-  z-index: 20;
+  z-index: 2000;
   animation: fade-in 0.2s ease both;
   overflow-y: auto;
 }
@@ -2285,49 +2297,37 @@ textarea:focus {
 .roulette-game {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.25rem;
   width: 100%;
   max-width: 1000px;
   margin: 0 auto;
+  padding-top: 1.5rem;
 }
 
-.roulette-header {
+.roulette-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: var(--card);
-  padding: 1rem 1.5rem;
-  border-radius: 16px;
-  box-shadow: var(--shadow);
+  background: rgba(0, 0, 0, 0.2);
+  padding: 0.75rem 1.25rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  margin-top: 1rem;
 }
 
 .player-name-display {
   font-weight: 700;
-}
-
-.roulette-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: var(--card);
-  padding: 1rem 1.5rem;
-  border-radius: 16px;
-  box-shadow: var(--shadow);
-}
-
-.player-name-display {
-  font-weight: 700;
-  font-size: 1.2rem;
-  margin-right: 1rem;
+  font-size: 1.1rem;
+  margin-right: 0.75rem;
 }
 
 .player-money-display {
-  font-family: monospace;
-  font-size: 1.2rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.1rem;
   color: var(--accent-alt);
-  background: rgba(44, 229, 152, 0.1);
+  background: rgba(44, 229, 152, 0.15);
   padding: 0.2rem 0.6rem;
-  border-radius: 8px;
+  border-radius: 6px;
 }
 
 .roulette-container {
@@ -2514,6 +2514,51 @@ textarea:focus {
   }
 }
 
+/* Casino Title & Fire Effect */
+.casino-title-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: clamp(180px, 30vh, 240px);
+  background: transparent;
+  /* No background here, we want it to blend */
+  border-radius: 24px;
+  margin-bottom: 2rem;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+}
+
+.fire-gif {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+  opacity: 0.9;
+}
+
+.casino-logo {
+  position: relative;
+  z-index: 10;
+  max-width: 90%;
+  max-height: 140px;
+  object-fit: contain;
+  background: transparent !important;
+  filter: drop-shadow(0 0 15px rgba(0, 0, 0, 0.9));
+}
+
+@media (max-height: 500px) and (orientation: landscape) {
+  .bottom-nav .tabs-container {
+    transform: scale(0.6);
+    transform-origin: bottom center;
+  }
+}
+
 .prize-title {
   font-size: 2.5rem;
   font-weight: 900;
@@ -2587,7 +2632,18 @@ textarea:focus {
   pointer-events: auto;
   cursor: pointer;
   z-index: 25;
-  /* background: rgba(255, 0, 0, 0.2);  Debug color */
+}
+
+.bet-hotspot.hotspot-square {
+  z-index: 30;
+}
+
+.bet-hotspot.hotspot-narrow {
+  z-index: 28;
+}
+
+.bet-hotspot.hotspot-wide {
+  z-index: 26;
 }
 
 .bet-hotspot:hover {
@@ -2804,7 +2860,10 @@ textarea:focus {
 
 .action-controls {
   display: flex;
-  gap: 1rem;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
 .spin-btn {
@@ -2882,67 +2941,100 @@ textarea:focus {
 /* History Controls */
 .roulette-history-controls {
   position: absolute;
-  top: -12px;
-  /* Elevado sobre el tapete */
+  top: -16px;
+  /* Moved lower */
   left: 50%;
-  transform: translateX(-50%);
+  transform: translateX(-50%) scale(0.85);
+  /* Smaller scale */
   display: flex;
-  gap: 1.25rem;
+  align-items: center;
+  gap: 1rem;
   z-index: 30;
+  background: rgba(12, 18, 30, 0.95);
+  padding: 4px 16px;
+  border-radius: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(12px);
+  min-width: max-content;
+}
+
+.total-bet-display {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #ffd23f;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 210, 63, 0.2);
+  white-space: nowrap;
+}
+
+.history-btns-group {
+  display: flex;
+  gap: 0.45rem;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 3px;
+  border-radius: 30px;
 }
 
 .btn-history {
-  background: rgba(12, 15, 30, 0.85);
-  border: 2px solid rgba(255, 255, 255, 0.4);
-  color: white;
-  width: 38px;
-  height: 38px;
+  background: transparent;
+  border: none;
+  color: #fff;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  backdrop-filter: blur(8px);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-}
-
-.btn-history svg {
-  width: 20px;
-  height: 20px;
-  transition: transform 0.2s;
+  transition: all 0.2s ease;
 }
 
 .btn-history:hover:not(:disabled) {
-  background: #7f5af0;
-  border-color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 15px rgba(127, 90, 240, 0.5);
-}
-
-.btn-history:hover:not(:disabled) svg {
-  transform: scale(1.1);
-}
-
-.btn-history:active:not(:disabled) {
-  transform: translateY(0);
+  background: rgba(127, 90, 240, 0.8);
+  box-shadow: 0 4px 12px rgba(127, 90, 240, 0.3);
 }
 
 .btn-history:disabled {
-  opacity: 0.15;
+  opacity: 0.2;
   cursor: not-allowed;
-  filter: grayscale(1);
+}
+
+.btn-repeat {
+  background: linear-gradient(135deg, #7f5af0, #4dc7d9);
+  width: auto;
+  height: 36px;
+  border-radius: 20px;
+  padding: 0 16px;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 15px rgba(127, 90, 240, 0.4);
+}
+
+.btn-repeat span {
+  font-family: inherit;
+}
+
+.btn-repeat svg {
+  width: 16px;
+  height: 16px;
 }
 
 @media (max-width: 800px) {
   .roulette-history-controls {
-    top: -15px;
-    gap: 0.75rem;
+    top: -30px;
+    gap: 0.6rem;
+    padding: 4px 12px;
   }
 
-  .btn-history {
-    width: 34px;
-    height: 34px;
+  .total-bet-display {
+    font-size: 0.85rem;
+    padding: 4px 10px;
   }
 }
 

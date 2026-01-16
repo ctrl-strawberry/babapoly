@@ -155,11 +155,13 @@ export const initHome = ({
   playerList,
   playerToolbar,
   addPlayerBtn,
+  resetGameBtn,
   settingsToggle,
   playerCardTemplate,
   modalContainer,
   bottomNav,
   onPlayersUpdated = () => { },
+  resetGame = () => { },
 }) => {
   const transferState = { from: null, to: null, prizeMode: false };
   let editingMode = false;
@@ -218,7 +220,10 @@ export const initHome = ({
     }, stepDuration);
   };
 
-  addPlayerBtn.hidden = true;
+
+  addPlayerBtn.hidden = false;
+  resetGameBtn.hidden = false;
+  if (playerToolbar) playerToolbar.hidden = false;
 
   const setBottomNavHidden = (hidden) => {
     if (!bottomNav) return;
@@ -481,6 +486,60 @@ export const initHome = ({
         closeModal();
       }
     });
+
+    modalContainer.appendChild(modal);
+    activeModal = modal;
+    setBottomNavHidden(true);
+  };
+
+  const openResetModal = () => {
+    if (!editingMode) return;
+
+    closeModal();
+
+    const modal = document.createElement("div");
+    modal.className = "modal-backdrop";
+    modal.innerHTML = `
+      <div class="modal" role="dialog" aria-modal="true">
+        <h2>Reiniciar Partida</h2>
+        <p style="margin-bottom: 1rem;">Se reiniciará el <strong>bote</strong>, el <strong>dinero</strong> de los jugadores y el <strong>nivel</strong> de sus mascotas.</p>
+        
+        <form>
+          <label for="initialMoneySlider">Dinero inicial por jugador</label>
+          <div class="money-inputs">
+            <input id="initialMoneySlider" type="range" min="500" max="3000" step="100" value="500">
+            <input id="initialMoneyValue" type="number" min="500" max="3000" step="100" value="500">
+          </div>
+          
+          <div class="modal-actions" style="margin-top: 1.5rem;">
+            <button class="btn btn-ghost" type="button" data-action="cancel">Cancelar</button>
+            <button class="btn btn-danger" type="submit">Reiniciar Todo</button>
+          </div>
+        </form>
+      </div>
+    `;
+
+    const form = modal.querySelector("form");
+    const slider = form.querySelector("#initialMoneySlider");
+    const number = form.querySelector("#initialMoneyValue");
+
+    const sync = (val) => {
+      slider.value = val;
+      number.value = val;
+    };
+
+    slider.addEventListener("input", (e) => sync(e.target.value));
+    number.addEventListener("input", (e) => sync(e.target.value));
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      resetGame(Number(slider.value));
+      closeModal();
+      renderPlayers();
+    });
+
+    modal.querySelector("[data-action='cancel']").addEventListener("click", closeModal);
+    modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
 
     modalContainer.appendChild(modal);
     activeModal = modal;
@@ -1326,10 +1385,15 @@ export const initHome = ({
 
   const toggleEditing = () => {
     editingMode = !editingMode;
+    const navContainer = settingsToggle.closest(".header-nav-container");
+
     settingsToggle.classList.toggle("active", editingMode);
     settingsToggle.setAttribute("aria-pressed", String(editingMode));
-    playerToolbar.hidden = !editingMode;
-    addPlayerBtn.hidden = !editingMode;
+    navContainer?.classList.toggle("is-active", editingMode);
+
+    // We don't use .hidden anymore to allow transitions
+    if (playerToolbar) playerToolbar.hidden = false;
+
     clearTransferSelection();
     renderPlayers();
   };
@@ -1337,16 +1401,19 @@ export const initHome = ({
   const disableEditing = () => {
     if (!editingMode) return;
     editingMode = false;
+    const navContainer = settingsToggle.closest(".header-nav-container");
+
     settingsToggle.classList.remove("active");
     settingsToggle.setAttribute("aria-pressed", "false");
-    playerToolbar.hidden = true;
-    addPlayerBtn.hidden = true;
+    navContainer?.classList.remove("is-active");
+
     clearTransferSelection();
     renderPlayers();
   };
 
   settingsToggle.addEventListener("click", toggleEditing);
   addPlayerBtn.addEventListener("click", openAddPlayerModal);
+  resetGameBtn.addEventListener("click", openResetModal);
 
   return {
     render: renderPlayers,

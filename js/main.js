@@ -1,8 +1,8 @@
-import { state } from "./state.js?v=2";
-import { initHome } from "./home.js?v=2";
-import { initJimbo } from "./jimbo.js?v=2";
-import { initRoulette } from "./roulette.js?v=2";
-import { initImageLab } from "./image-lab.js?v=2";
+import { state, resetGame } from "./state.js";
+import { initHome } from "./home.js";
+import { initJimbo } from "./jimbo.js";
+import { initRoulette } from "./roulette.js";
+import { initImageLab } from "./image-lab.js";
 
 const screens = {
   inicio: document.getElementById("screen-inicio"),
@@ -18,6 +18,7 @@ const homeHeader = document.getElementById("homeHeader");
 const settingsToggle = document.getElementById("settingsToggle");
 const playerToolbar = document.getElementById("playerToolbar");
 const addPlayerBtn = document.getElementById("addPlayerBtn");
+const resetGameBtn = document.getElementById("resetGameBtn");
 const playerList = document.getElementById("playerList");
 const playerCardTemplate = document.getElementById("playerCardTemplate");
 const playerSelectTemplate = document.getElementById("playerSelectCard");
@@ -52,6 +53,8 @@ const clearBetsBtn = document.getElementById("clearBetsBtn");
 const rouletteExitBtn = document.getElementById("rouletteExitBtn");
 const undoBtn = document.getElementById("undoBtn");
 const redoBtn = document.getElementById("redoBtn");
+const repeatBetsBtn = document.getElementById("repeatBetsBtn");
+const rouletteTotalBet = document.getElementById("rouletteTotalBet");
 const lastResults = document.getElementById("lastResults");
 
 const deriveBasePath = () => {
@@ -108,6 +111,7 @@ const home = initHome({
   playerList,
   playerToolbar,
   addPlayerBtn,
+  resetGameBtn,
   settingsToggle,
   playerCardTemplate,
   modalContainer,
@@ -116,6 +120,7 @@ const home = initHome({
     jimboApi?.renderPlayerSelector(players);
     rouletteApi?.renderPlayerSelector(players);
   },
+  resetGame,
 });
 
 jimboApi = initJimbo({
@@ -154,6 +159,8 @@ rouletteApi = initRoulette({
   clearBetsBtn,
   undoBtn,
   redoBtn,
+  repeatBetsBtn,
+  totalBetCounter: rouletteTotalBet,
   rouletteExitBtn,
   lastResults,
   playerSelectTemplate,
@@ -162,7 +169,7 @@ rouletteApi = initRoulette({
   homeActions: {
     render: () => home.render(),
     showMoneyAnimation: (playerId, amount) => home.showMoneyAnimation(playerId, amount),
-    getPlayers: () => state.players, // Added this helper
+    getPlayers: () => state.players,
   },
 });
 

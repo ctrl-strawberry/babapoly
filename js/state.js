@@ -223,3 +223,14 @@ export const removeCreatedPlayer = (playerId) => {
 
 export const isPlayerActive = (playerId) =>
   state.players.some((player) => player.id === playerId);
+
+export const resetGame = (initialMoney) => {
+  const money = Math.max(0, Math.round(toFiniteNumber(initialMoney, 500)));
+  state.pot = 0;
+  state.players = state.players.map(player => ({
+    ...player,
+    money: money,
+    pet: { level: 1, xp: 0 }
+  }));
+  saveState();
+};

@@ -25,6 +25,8 @@ export const initRoulette = ({
   clearBetsBtn,
   undoBtn,
   redoBtn,
+  repeatBetsBtn,
+  totalBetCounter,
   rouletteExitBtn,
   lastResults,
   playerSelectTemplate,
@@ -38,6 +40,7 @@ export const initRoulette = ({
   let recentResults = [];
   let undoStack = [];
   let redoStack = [];
+  let lastBets = null; // To store previous game bets
 
   // --- Initialization & Navigation ---
 
@@ -62,6 +65,9 @@ export const initRoulette = ({
     const player = getPlayerById(playerId);
     if (!player) return;
 
+    const selectHeader = document.getElementById("rouletteSelectHeader");
+    if (selectHeader) selectHeader.style.display = "none";
+
     rouletteSelect.hidden = true;
     rouletteGame.hidden = false;
     updatePlayerDisplay();
@@ -72,6 +78,9 @@ export const initRoulette = ({
 
   const exitGame = () => {
     currentPlayerId = null;
+    const selectHeader = document.getElementById("rouletteSelectHeader");
+    if (selectHeader) selectHeader.style.display = "";
+
     rouletteGame.hidden = true;
     rouletteSelect.hidden = false;
     showScreen("inicio");
@@ -83,6 +92,12 @@ export const initRoulette = ({
       roulettePlayerName.textContent = player.name;
       roulettePlayerMoney.textContent = formatMoney(player.money);
     }
+  };
+
+  const updateTotalBet = () => {
+    if (!totalBetCounter) return;
+    const total = Object.values(currentBets).reduce((a, b) => a + b, 0);
+    totalBetCounter.textContent = total;
   };
 
   // --- Board Rendering ---
@@ -148,63 +163,47 @@ export const initRoulette = ({
       const width = cell.offsetWidth;
       const height = cell.offsetHeight;
 
-      // 1. Horizontal Split (Right)
-      // If not in the last column (multiples of 3 are top row, but columns are 1..12)
-      // Column logic: Math.ceil(i / 3). Max 12.
-      // So if Math.ceil(i/3) < 12, we have a right neighbor.
-      // Right neighbor is i + 3.
+      // 1. Horizontal Split (Right) - Vertical strip (20px wide)
       if (Math.ceil(i / 3) < 12) {
         const neighbor = i + 3;
         createHotspot(overlay, `split-${i}-${neighbor}`,
-          left + width - 10, top, 20, height); // 20px wide centered on line
+          left + width - 10, top, 20, height, "hotspot-narrow");
       }
 
-      // 2. Vertical Split (Bottom)
-      // If not in the bottom row (Row 3: 1, 4, 7...). i % 3 === 1.
-      // Bottom neighbor is i - 1.
+      // 2. Vertical Split (Bottom) - Horizontal strip (Width wide)
       if (i % 3 !== 1) {
         const neighbor = i - 1;
         createHotspot(overlay, `split-${neighbor}-${i}`,
-          left, top + height - 10, width, 20); // 20px high centered on line
+          left, top + height - 10, width, 20, "hotspot-wide");
       }
 
-      // 3. Corner (Bottom-Right)
-      // Needs Right Neighbor AND Bottom Neighbor.
-      // i + 3 exists AND i - 1 exists.
+      // 3. Corner (Bottom-Right) - Square (20x20)
       if (Math.ceil(i / 3) < 12 && i % 3 !== 1) {
-        // Corner: i, i-1, i+3, i+2
-        // Sorted: i-1, i, i+2, i+3
         const n1 = i - 1;
         const n2 = i;
         const n3 = i + 2;
         const n4 = i + 3;
         createHotspot(overlay, `corner-${n1}-${n2}-${n3}-${n4}`,
-          left + width - 10, top + height - 10, 20, 20);
+          left + width - 10, top + height - 10, 20, 20, "hotspot-square");
       }
 
-      // 4. Street (Top Edge of Top Row)
-      // Row 1: 3, 6, 9... (i % 3 === 0)
+      // 4. Street (Top Edge) - Horizontal strip (Width wide)
       if (i % 3 === 0) {
-        // Street 1-2-3 is above 3.
-        // Street n-2, n-1, n
         createHotspot(overlay, `street-${i - 2}-${i - 1}-${i}`,
-          left, top - 10, width, 20);
+          left, top - 10, width, 20, "hotspot-wide");
 
-        // 5. Line (Top-Right Corner of Top Row)
-        // Intersection of Street i and Street i+3
+        // 5. Line (Top-Right) - Square (20x20)
         if (Math.ceil(i / 3) < 12) {
-          // Line: i-2..i and i+1..i+3
-          // e.g. 3 and 6 -> Line 1-6
           createHotspot(overlay, `line-${i - 2}-${i + 3}`,
-            left + width - 10, top - 10, 20, 20);
+            left + width - 10, top - 10, 20, 20, "hotspot-square");
         }
       }
     }
   };
 
-  const createHotspot = (container, betId, left, top, width, height) => {
+  const createHotspot = (container, betId, left, top, width, height, extraClass = "") => {
     const spot = document.createElement("div");
-    spot.className = "bet-hotspot";
+    spot.className = `bet-hotspot ${extraClass}`;
     spot.dataset.betId = betId;
     spot.style.left = `${left}px`;
     spot.style.top = `${top}px`;
@@ -258,7 +257,8 @@ export const initRoulette = ({
 
     pushToHistory(betId, selectedChipValue);
     addChipVisual(betId);
-    updateMessage(`Apuesta total: ${formatMoney(Object.values(currentBets).reduce((a, b) => a + b, 0))}`);
+    updateTotalMessage();
+    updateTotalBet();
   };
 
   const pushToHistory = (betId, amount) => {
@@ -282,6 +282,7 @@ export const initRoulette = ({
 
     updateTotalMessage();
     updateHistoryButtons();
+    updateTotalBet();
   };
 
   const redo = () => {
@@ -295,6 +296,7 @@ export const initRoulette = ({
     addChipVisual(action.betId);
     updateTotalMessage();
     updateHistoryButtons();
+    updateTotalBet();
   };
 
   const updateHistoryButtons = () => {
@@ -384,6 +386,64 @@ export const initRoulette = ({
     document.querySelectorAll(".chip").forEach(c => c.remove());
     updateMessage("Hagan sus apuestas");
     updateHistoryButtons();
+    updateTotalBet();
+  };
+
+  const repeatLastBets = () => {
+    if (!lastBets || Object.keys(lastBets).length === 0) {
+      showToast("No hay apuestas previas que repetir.");
+      return;
+    }
+
+    const player = getPlayerById(currentPlayerId);
+    const totalToRepeat = Object.values(lastBets).reduce((a, b) => a + b, 0);
+
+    if (player.money < totalToRepeat) {
+      showToast("No tienes suficiente dinero para repetir la apuesta.");
+      return;
+    }
+
+    clearBets();
+    currentBets = JSON.parse(JSON.stringify(lastBets));
+
+    // Re-render chips on board
+    for (const [betId, amount] of Object.entries(currentBets)) {
+      renderChipsOnCell(betId, amount);
+    }
+
+    updateTotalBet();
+    updateHistoryButtons();
+    showToast("Apuestas repetidas.");
+  };
+
+  const renderChipsOnCell = (betId, amount) => {
+    const cell = document.querySelector(`[data-bet-id="${betId}"]`);
+    if (!cell) return;
+
+    // We need to find or create the chip for this cell
+    let chip = cell.querySelector(".chip");
+    if (!chip) {
+      chip = document.createElement("div");
+      cell.appendChild(chip);
+    }
+
+    // Calculate total display
+    chip.textContent = amount >= 1000 ? `${(amount / 1000).toFixed(1)}k` : amount;
+
+    // Position classes (logic simplified for brevity, similar to placeBet)
+    let positionClass = "center";
+    if (betId.startsWith("split-")) positionClass = "split";
+    if (betId.startsWith("corner-")) positionClass = "corner";
+    // ... add other classes if necessary
+
+    chip.className = `chip ${positionClass}`;
+    if (amount >= 1000) chip.classList.add("chip-1000");
+    else if (amount >= 500) chip.classList.add("chip-500");
+    else if (amount >= 100) chip.classList.add("chip-100");
+    else if (amount >= 50) chip.classList.add("chip-50");
+    else if (amount >= 10) chip.classList.add("chip-10");
+    else if (amount >= 5) chip.classList.add("chip-5");
+    else chip.classList.add("chip-1");
   };
 
   // --- Result Handling ---
@@ -461,6 +521,7 @@ export const initRoulette = ({
 
     saveState();
     updatePlayerDisplay();
+    lastBets = JSON.parse(JSON.stringify(currentBets)); // Save before clearing
     clearBets();
   };
 
@@ -542,6 +603,7 @@ export const initRoulette = ({
   clearBetsBtn.addEventListener("click", clearBets);
   undoBtn.addEventListener("click", undo);
   redoBtn.addEventListener("click", redo);
+  repeatBetsBtn.addEventListener("click", repeatLastBets);
   rouletteExitBtn.addEventListener("click", exitGame);
 
   // Keyboard Shortcuts
