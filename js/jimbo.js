@@ -2,11 +2,11 @@ import { saveState, getPlayerById, addToPot } from "./state.js";
 import { randomBetween } from "./utils.js";
 
 const ATTACKS = [
-  { level: 1, name: "Arañazo tímido", min: 8, max: 12 },
-  { level: 2, name: "Mordisco chillón", min: 12, max: 18 },
-  { level: 3, name: "Patada estelar", min: 18, max: 26 },
-  { level: 4, name: "Onda baba", min: 24, max: 34 },
-  { level: 5, name: "Explosión polimorfa", min: 32, max: 46 },
+  { level: 1, name: "Arañazo tímido", min: 14, max: 20 },
+  { level: 2, name: "Mordisco chillón", min: 22, max: 30 },
+  { level: 3, name: "Patada estelar", min: 32, max: 44 },
+  { level: 4, name: "Onda baba", min: 46, max: 62 },
+  { level: 5, name: "Explosión polimorfa", min: 65, max: 85 },
 ];
 
 const ENEMIES = [
@@ -129,8 +129,8 @@ export const initJimbo = ({
     if (!battleState) return;
     triggerAttackAnimation("enemy");
     const damage = randomBetween(
-      10 + battleState.enemyLevel * 2,
-      18 + battleState.enemyLevel * 3,
+      6 + battleState.enemyLevel * 2,
+      12 + battleState.enemyLevel * 3,
     );
     battleState.playerHp = Math.max(0, battleState.playerHp - damage);
     appendLog(`${battleState.enemyName} golpea y hace ${damage} de daño.`);
@@ -213,7 +213,23 @@ export const initJimbo = ({
 
     const petLevel = player.pet.level;
     const playerMaxHp = 60 + petLevel * 20;
-    const enemyLevel = Math.max(1, petLevel + randomBetween(-1, 1));
+
+    let enemyLevel;
+    const r = Math.random();
+    if (petLevel === 1) {
+      // 75% mismo nivel (1), 25% nivel superior (2)
+      enemyLevel = r < 0.75 ? 1 : 2;
+    } else {
+      // 50% mismo nivel, 25% inferior, 25% superior
+      if (r < 0.25) {
+        enemyLevel = petLevel - 1;
+      } else if (r < 0.75) {
+        enemyLevel = petLevel;
+      } else {
+        enemyLevel = petLevel + 1;
+      }
+    }
+    enemyLevel = Math.max(1, enemyLevel);
     const enemyMaxHp = 60 + enemyLevel * 18;
 
     // Pick a random enemy from our Pokemon list
