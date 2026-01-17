@@ -1759,16 +1759,14 @@ textarea:focus {
   background: #c62828;
 }
 
-.player-card.is-animating::after {
+.player-card.gain::after,
+.player-card.loss::after {
   animation: cardOverlay 5s ease-in-out forwards;
 }
 
-.player-card.is-animating .player-card-content {
+.player-card.gain .player-card-content,
+.player-card.loss .player-card-content {
   animation: cardOverlayContent 5s ease-in-out forwards;
-}
-
-.player-card.is-animating {
-  pointer-events: none;
 }
 
 @keyframes cardOverlay {

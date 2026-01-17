@@ -289,7 +289,7 @@ export const initHome = ({
     const type = amount > 0 ? "gain" : "loss";
     const overlayText = `${amount > 0 ? "+" : ""}${amount.toLocaleString("es-ES")}€`;
 
-    targetCard.classList.remove("is-animating", "gain", "loss");
+    targetCard.classList.remove("gain", "loss");
     delete targetCard.dataset.overlay;
     // Force reflow to restart animation
     void targetCard.offsetWidth;
@@ -299,12 +299,12 @@ export const initHome = ({
 
     const handleAnimationEnd = (event) => {
       if (event.animationName !== "cardOverlayContent") return;
-      targetCard.classList.remove("is-animating", "gain", "loss");
+      targetCard.classList.remove("gain", "loss");
       delete targetCard.dataset.overlay;
     };
 
     content.addEventListener("animationend", handleAnimationEnd, { once: true });
-    requestAnimationFrame(() => targetCard.classList.add("is-animating"));
+    requestAnimationFrame(() => targetCard.classList.add(type));
   };
 
   const openDeleteConfirmModal = (playerId) => {
