@@ -251,6 +251,13 @@ document.addEventListener("keydown", (event) => {
   if (currentScreen === "jimbo" && jimboApi.abortBattle()) return;
 });
 
+// Escuchar actualizaciones de estado (por ejemplo, de otras pestañas)
+window.addEventListener("baba-poly-state-updated", () => {
+  home.render();
+  jimboApi.renderPlayerSelector(state.players);
+  rouletteApi.renderPlayerSelector(state.players);
+});
+
 // Render inicial
 home.render();
 jimboApi.renderPlayerSelector(state.players);

@@ -130,13 +130,52 @@ export const loadState = () => {
 
 export const state = loadState();
 
+let saveTimeout = null;
+/**
+ * Guarda el estado en localStorage de forma debounced para evitar escrituras excesivas
+ * y posibles condiciones de carrera durante cambios rápidos.
+ */
 export const saveState = () => {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  } catch (error) {
-    console.warn("No se pudo guardar el estado:", error);
-  }
+  if (saveTimeout) clearTimeout(saveTimeout);
+
+  saveTimeout = setTimeout(() => {
+    try {
+      const serialized = JSON.stringify(state);
+      localStorage.setItem(STORAGE_KEY, serialized);
+    } catch (error) {
+      if (error.name === "QuotaExceededError" || error.name === "NS_ERROR_DOM_QUOTA_REACHED") {
+        console.error("Error: El almacenamiento local está lleno. No se pudo guardar el estado.");
+        // Podríamos disparar un evento personalizado para que la UI avise al usuario
+      } else {
+        console.warn("No se pudo guardar el estado:", error);
+      }
+    }
+    saveTimeout = null;
+  }, 100); // 100ms de debounce
 };
+
+/**
+ * Escucha cambios en el almacenamiento desde otras pestañas para mantener el estado sincronizado.
+ */
+window.addEventListener("storage", (event) => {
+  if (event.key === STORAGE_KEY && event.newValue) {
+    try {
+      const newState = JSON.parse(event.newValue);
+      // Actualizamos las propiedades del objeto state in-place 
+      // para que las referencias exportadas sigan siendo válidas
+      Object.assign(state, {
+        players: sanitizePlayerCollection(newState.players),
+        createdPlayers: sanitizePlayerCollection(newState.createdPlayers),
+        pot: typeof newState.pot === "number" ? newState.pot : 0
+      });
+
+      // DISPATCH CUSTOM EVENT para que la UI sepa que debe re-renderizarse
+      window.dispatchEvent(new CustomEvent("baba-poly-state-updated"));
+    } catch (e) {
+      console.error("Error al sincronizar el estado desde otra pestaña:", e);
+    }
+  }
+});
 
 export const getPlayerById = (id) => state.players.find((player) => player.id === id);
 

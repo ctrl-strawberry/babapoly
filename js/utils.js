@@ -47,3 +47,42 @@ export const fetchAssetAsBase64 = async (url) => {
   const base64 = await readBlobAsBase64(blob);
   return { base64, mimeType: blob.type || "image/png" };
 };
+
+/**
+ * Comprime una imagen en base64 redimensionándola y ajustando su calidad.
+ * @param {string} base64 - Imagen en base64 (con o sin prefijo data:).
+ * @param {object} options - Opciones de compresión.
+ * @returns {Promise<string>} - Imagen comprimida en base64 (con prefijo data:).
+ */
+export const compressImage = (base64, { maxWidth = 256, maxHeight = 256, quality = 0.7, mimeType = "image/jpeg" } = {}) => {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.src = base64.startsWith("data:") ? base64 : `data:image/png;base64,${base64}`;
+    img.onload = () => {
+      let width = img.width;
+      let height = img.height;
+
+      if (width > height) {
+        if (width > maxWidth) {
+          height *= maxWidth / width;
+          width = maxWidth;
+        }
+      } else {
+        if (height > maxHeight) {
+          width *= maxHeight / height;
+          height = maxHeight;
+        }
+      }
+
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0, width, height);
+
+      const compressed = canvas.toDataURL(mimeType, quality);
+      resolve(compressed);
+    };
+    img.onerror = (e) => reject(e);
+  });
+};

@@ -10,7 +10,7 @@ import {
   isPlayerActive,
   takePot,
 } from "./state.js";
-import { formatMoney, readFileAsBase64, toDataUrl } from "./utils.js";
+import { formatMoney, readFileAsBase64, toDataUrl, compressImage } from "./utils.js";
 
 const BANK_PLAYER_ID = "bank";
 const BANK_PLAYER_NAME = "Banca";
@@ -1138,7 +1138,15 @@ export const initHome = ({
 
       try {
         const colorHex = sanitizeHexColor(selectedColorHex);
-        const avatarDataUrl = await requestAvatarFromBackend(photoFile, { colorHex });
+        let avatarDataUrl = await requestAvatarFromBackend(photoFile, { colorHex });
+
+        // Optimizar la imagen antes de guardar
+        try {
+          avatarDataUrl = await compressImage(avatarDataUrl, { maxWidth: 256, maxHeight: 256, quality: 0.7 });
+        } catch (compressErr) {
+          console.warn("No se pudo comprimir la imagen, se usará la original:", compressErr);
+        }
+
         const newPlayer = {
           id: crypto.randomUUID(),
           name,
