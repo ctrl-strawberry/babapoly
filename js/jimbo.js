@@ -2,11 +2,11 @@ import { saveState, getPlayerById, addToPot } from "./state.js";
 import { randomBetween } from "./utils.js";
 
 const ATTACKS = [
-  { level: 1, name: "Arañazo tímido", min: 14, max: 20 },
-  { level: 2, name: "Mordisco chillón", min: 22, max: 30 },
+  { level: 1, name: "Ara\u00f1azo t\u00edmido", min: 14, max: 20 },
+  { level: 2, name: "Mordisco chill\u00f3n", min: 22, max: 30 },
   { level: 3, name: "Patada estelar", min: 32, max: 44 },
   { level: 4, name: "Onda baba", min: 46, max: 62 },
-  { level: 5, name: "Explosión polimorfa", min: 65, max: 85 },
+  { level: 5, name: "Explosi\u00f3n polimorfa", min: 65, max: 85 },
 ];
 
 const ENEMIES = [
@@ -50,7 +50,7 @@ export const initJimbo = ({
   const playSpriteAnimation = (element, className) => {
     if (!element) return;
     element.classList.remove(className);
-    // Reinicia la animación forzando un reflow
+    // Reinicia la animaci\u00f3n forzando un reflow
     void element.offsetWidth;
     element.classList.add(className);
     const handleAnimationEnd = () => {
@@ -114,8 +114,14 @@ export const initJimbo = ({
     attackGrid.innerHTML = "";
     attacks.forEach((attack) => {
       const button = document.createElement("button");
+      const attackName = document.createElement("span");
+      const attackDamage = document.createElement("span");
       button.className = "attack-btn";
-      button.textContent = `${attack.name} · ${attack.min}-${attack.max}`;
+      attackName.className = "attack-name";
+      attackDamage.className = "attack-damage";
+      attackName.textContent = attack.name;
+      attackDamage.textContent = `${attack.min}-${attack.max} DMG`;
+      button.append(attackName, attackDamage);
       button.addEventListener("click", () => {
         if (battleState?.turn === "player" && !battleState.locked) {
           executePlayerAttack(attack);
@@ -133,7 +139,7 @@ export const initJimbo = ({
       12 + battleState.enemyLevel * 3,
     );
     battleState.playerHp = Math.max(0, battleState.playerHp - damage);
-    appendLog(`${battleState.enemyName} golpea y hace ${damage} de daño.`);
+    appendLog(`${battleState.enemyName} golpea y hace ${damage} de da\u00f1o.`);
     updateHealthBars();
     triggerHitAnimation("player");
     if (battleState.playerHp <= 0) {
@@ -194,7 +200,7 @@ export const initJimbo = ({
     triggerAttackAnimation("player");
     const damage = randomBetween(attack.min, attack.max);
     battleState.enemyHp = Math.max(0, battleState.enemyHp - damage);
-    appendLog(`Tu mascota usa ${attack.name} y causa ${damage} de daño.`);
+    appendLog(`Tu mascota usa ${attack.name} y causa ${damage} de da\u00f1o.`);
     updateHealthBars();
     triggerHitAnimation("enemy");
     if (battleState.enemyHp <= 0) {
@@ -262,7 +268,7 @@ export const initJimbo = ({
 
     updateHealthBars();
     renderAttacks(petLevel);
-    appendLog(`¡${player.name} entra en combate!`);
+    appendLog(`\u00a1${player.name} entra en combate!`);
     appendLog(`Aparece ${battleState.enemyName} (nivel ${enemyLevel}).`);
   };
 
@@ -272,7 +278,7 @@ export const initJimbo = ({
       const card = playerSelectTemplate.content.firstElementChild.cloneNode(true);
       card.dataset.playerId = player.id;
       card.querySelector(".player-name").textContent = player.name;
-      card.querySelector(".player-money").textContent = `${player.money.toLocaleString("es-ES")} monedas · Nivel ${player.pet.level}`;
+      card.querySelector(".player-money").textContent = `${player.money.toLocaleString("es-ES")} monedas \u00b7 Nivel ${player.pet.level}`;
       card.querySelector("button").addEventListener("click", () => startBattle(player.id));
       playerSelectContainer.appendChild(card);
     });
@@ -294,3 +300,7 @@ export const initJimbo = ({
     abortBattle,
   };
 };
+
+
+
+

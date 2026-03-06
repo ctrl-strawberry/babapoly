@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   color-scheme: light dark;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   --bg: #f4f6fd;
@@ -4211,6 +4211,11 @@ textarea:focus {
 }
 
 #screen-jimbo .attack-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0.28rem;
   min-height: 78px;
   padding: 0.7rem 0.9rem;
   border: 2px solid #47503f;
@@ -4224,7 +4229,22 @@ textarea:focus {
   line-height: 1.35;
   letter-spacing: 0.04em;
   text-transform: uppercase;
+  text-align: left;
   transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.12s ease;
+}
+
+#screen-jimbo .attack-name {
+  color: #273021;
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+#screen-jimbo .attack-damage {
+  color: rgba(39, 48, 33, 0.68);
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1.1;
 }
 
 #screen-jimbo .attack-btn:hover:not(:disabled) {
@@ -4286,7 +4306,9 @@ textarea:focus {
   }
 
   #screen-jimbo .battle-info {
-    width: calc(100% - 1.3rem);
+    width: min(150px, calc(50% - 0.9rem));
+    max-width: calc(50% - 0.9rem);
+    padding: 0.6rem 0.7rem;
   }
 
   #screen-jimbo .battle-info-enemy {
@@ -4299,6 +4321,15 @@ textarea:focus {
     bottom: 0.65rem;
   }
 
+  #screen-jimbo .battle-info-name {
+    font-size: 0.76rem;
+  }
+
+  #screen-jimbo .battle-info-level {
+    font-size: 0.66rem;
+    padding: 0.16rem 0.42rem;
+  }
+
   #screen-jimbo .attack-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -4309,3 +4340,5 @@ textarea:focus {
     font-size: 0.72rem;
   }
 }
+
+

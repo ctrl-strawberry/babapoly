@@ -24,9 +24,9 @@ const prefersDarkScheme =
 
 const COLOR_PRESETS = [
   { label: "Amarillo Solar", value: DEFAULT_PLAYER_COLOR },
-  { label: "Neón Violeta", value: "#7f5af0" },
+  { label: "Ne\u00f3n Violeta", value: "#7f5af0" },
   { label: "Cian Plasma", value: "#00b7ff" },
-  { label: "Verde Ácido", value: "#2ce598" },
+  { label: "Verde \u00c1cido", value: "#2ce598" },
   { label: "Magenta Pulsar", value: "#ff2d88" },
   { label: "Coral Prisma", value: "#ff5f57" },
   { label: "Naranja Aurora", value: "#ff8a4d" },
@@ -111,7 +111,7 @@ const requestAvatarFromBackend = async (
   const base64Source = await readFileAsBase64(file);
   const fallback = toDataUrl(base64Source, file.type || "image/png");
   const backgroundColor = sanitizeHexColor(colorHex);
-  const prompt = `crea una imagen de mi cara, añademe monoculo, un mini bombin y un gran bigote blanco clasico. que solo se vea la cara en primer plano. añade un fondo del color ${backgroundColor} con estilo ciberpunk e iluminación cinematográfica, con luces de neón y volumen dramático. la composición debe asemejarse a una foto tipo dni, rostro centrado y mirada al frente.`;
+  const prompt = `crea una imagen de mi cara, a\u00f1ademe monoculo, un mini bombin y un gran bigote blanco clasico. que solo se vea la cara en primer plano. a\u00f1ade un fondo del color ${backgroundColor} con estilo ciberpunk e iluminaci\u00f3n cinematogr\u00e1fica, con luces de ne\u00f3n y volumen dram\u00e1tico. la composici\u00f3n debe asemejarse a una foto tipo dni, rostro centrado y mirada al frente.`;
 
   if (!base64Source) {
     return fallback;
@@ -287,7 +287,7 @@ export const initHome = ({
     if (!content) return;
 
     const type = amount > 0 ? "gain" : "loss";
-    const overlayText = `${amount > 0 ? "+" : ""}${amount.toLocaleString("es-ES")}€`;
+    const overlayText = `${amount > 0 ? "+" : ""}${amount.toLocaleString("es-ES")}\u20ac`;
 
     targetCard.classList.remove("gain", "loss");
     delete targetCard.dataset.overlay;
@@ -318,7 +318,7 @@ export const initHome = ({
     modal.innerHTML = `
       <div class="modal" role="dialog" aria-modal="true">
         <h2>Eliminar jugador</h2>
-        <p>¿Seguro que quieres eliminar a <strong>${player.name}</strong>?</p>
+        <p>\u00bfSeguro que quieres eliminar a <strong>${player.name}</strong>?</p>
         <div class="modal-actions">
           <button class="btn btn-ghost" type="button" data-action="cancel">Cancelar</button>
           <button class="btn btn-danger" type="button" data-action="confirm">SI</button>
@@ -391,13 +391,13 @@ export const initHome = ({
       amountInput.setCustomValidity("");
       const rawValue = amountInput.value.trim();
       if (!rawValue.length) {
-        amountInput.setCustomValidity("Introduce una cantidad válida");
+        amountInput.setCustomValidity("Introduce una cantidad v\u00e1lida");
         amountInput.reportValidity();
         return;
       }
       const amount = Number(rawValue);
       if (!Number.isFinite(amount) || amount <= 0) {
-        amountInput.setCustomValidity("Introduce una cantidad válida");
+        amountInput.setCustomValidity("Introduce una cantidad v\u00e1lida");
         amountInput.reportValidity();
         return;
       }
@@ -461,7 +461,7 @@ export const initHome = ({
     modal.className = "modal-backdrop";
     modal.innerHTML = `
       <div class="prize-modal" role="dialog" aria-modal="true">
-        <h2 class="prize-title">¡PREMIO!</h2>
+        <h2 class="prize-title">\u00a1PREMIO!</h2>
         <div class="prize-amount">${formatMoney(potAmount)}</div>
         <p class="prize-winner">Felicidades <strong>${player.name}</strong>, el contenido del bote es tuyo.</p>
         <div class="modal-actions" style="justify-content: center; margin-top: 1rem;">
@@ -481,7 +481,7 @@ export const initHome = ({
 
     modal.addEventListener("click", (event) => {
       if (event.target === modal) {
-        // En este modal de gloria, quizás es mejor no cerrarlo por error clicando fuera
+          // En este modal de gloria, quiz\u00e1s es mejor no cerrarlo por error clicando fuera
         // pero por consistencia lo dejamos.
         closeModal();
       }
@@ -502,7 +502,7 @@ export const initHome = ({
     modal.innerHTML = `
       <div class="modal" role="dialog" aria-modal="true">
         <h2>Reiniciar Partida</h2>
-        <p style="margin-bottom: 1rem;">Se reiniciará el <strong>bote</strong>, el <strong>dinero</strong> de los jugadores y el <strong>nivel</strong> de sus mascotas.</p>
+        <p style="margin-bottom: 1rem;">Se reiniciar\u00e1 el <strong>bote</strong>, el <strong>dinero</strong> de los jugadores y el <strong>nivel</strong> de sus mascotas.</p>
         
         <form>
           <label for="initialMoneySlider">Dinero inicial por jugador</label>
@@ -566,12 +566,12 @@ export const initHome = ({
           <section class="created-players-section created-players-section-sheet">
             <div class="section-block-header">
               <div>
-                <h3>Catálogo</h3>
+                <h3>Cat\u00e1logo</h3>
               </div>
             </div>
             <div class="created-player-list created-player-list-sheet" id="createdPlayerList"></div>
             <div class="created-player-action-bar" id="createdPlayerActionBar" hidden>
-              <button class="btn btn-primary" type="button" data-action="addSelected">Añadir</button>
+              <button class="btn btn-primary" type="button" data-action="addSelected">A\u00f1adir</button>
               <button class="btn btn-danger" type="button" data-action="removeSelected">Eliminar</button>
             </div>
           </section>
@@ -612,7 +612,7 @@ export const initHome = ({
                       />
                     </svg>
                   </span>
-                  <span class="photo-picker-name">Cámara</span>
+                  <span class="photo-picker-name">C\u00e1mara</span>
                 </button>
                 <button class="photo-picker-option photo-picker-option-sheet" type="button" data-source="gallery">
                   <span class="photo-picker-icon" aria-hidden="true">
@@ -623,7 +623,7 @@ export const initHome = ({
                       />
                     </svg>
                   </span>
-                  <span class="photo-picker-name">Galería</span>
+                  <span class="photo-picker-name">Galer\u00eda</span>
                 </button>
               </div>
               <input id="newPlayerPhotoCamera" type="file" accept="image/*" capture="environment" hidden>
@@ -872,14 +872,14 @@ export const initHome = ({
         actionBar.setAttribute("aria-hidden", "true");
         if (addSelectedButton) {
           addSelectedButton.disabled = true;
-          addSelectedButton.textContent = "Añadir";
+          addSelectedButton.textContent = "A\u00f1adir";
           addSelectedButton.title =
-            "Selecciona un jugador para añadirlo a la partida";
+            "Selecciona un jugador para a\u00f1adirlo a la partida";
         }
         if (removeSelectedButton) {
           removeSelectedButton.disabled = true;
           removeSelectedButton.title =
-            "Selecciona un jugador para eliminarlo del catálogo";
+            "Selecciona un jugador para eliminarlo del cat\u00e1logo";
         }
         return;
       }
@@ -889,16 +889,16 @@ export const initHome = ({
 
       if (removeSelectedButton) {
         removeSelectedButton.disabled = false;
-        removeSelectedButton.title = `Eliminar a ${selectedPlayer.name} del catálogo`;
+        removeSelectedButton.title = `Eliminar a ${selectedPlayer.name} del cat\u00e1logo`;
       }
 
       if (addSelectedButton) {
         const alreadyActive = isPlayerActive(selectedPlayer.id);
         addSelectedButton.disabled = alreadyActive;
-        addSelectedButton.textContent = alreadyActive ? "Añadido" : "Añadir";
+        addSelectedButton.textContent = alreadyActive ? "A\u00f1adido" : "A\u00f1adir";
         addSelectedButton.title = alreadyActive
-          ? `${selectedPlayer.name} ya está en la partida.`
-          : `Añadir a ${selectedPlayer.name} a la partida`;
+          ? `${selectedPlayer.name} ya est\u00e1 en la partida.`
+          : `A\u00f1adir a ${selectedPlayer.name} a la partida`;
       }
     };
 
@@ -921,8 +921,8 @@ export const initHome = ({
         const emptyMessage = document.createElement("p");
         emptyMessage.className = "created-player-empty";
         emptyMessage.textContent = catalog.length
-          ? "Todos los jugadores guardados ya están en la partida."
-          : "Todavía no has guardado ningún jugador.";
+          ? "Todos los jugadores guardados ya est\u00e1n en la partida."
+          : "Todav\u00eda no has guardado ning\u00fan jugador.";
         createdList.appendChild(emptyMessage);
         return;
       }
@@ -1026,7 +1026,7 @@ export const initHome = ({
       }
       if (isPlayerActive(player.id)) {
         updateCreatedPlayerActionBar();
-        setStatusMessage(`${player.name} ya está en la partida actual.`);
+        setStatusMessage(`${player.name} ya est\u00e1 en la partida actual.`);
         return;
       }
       addPlayer({
@@ -1034,7 +1034,7 @@ export const initHome = ({
         pet: { ...player.pet },
       });
       renderPlayers();
-      setStatusMessage(`${player.name} se añadió a la partida.`);
+      setStatusMessage(`${player.name} se a\u00f1adi\u00f3 a la partida.`);
       renderCreatedPlayersList();
     });
 
@@ -1055,7 +1055,7 @@ export const initHome = ({
       const suffix = wasActive
         ? " Sigue disponible en la partida actual."
         : "";
-      setStatusMessage(`${player.name} se eliminó del catálogo.${suffix}`);
+      setStatusMessage(`${player.name} se elimin\u00f3 del cat\u00e1logo.${suffix}`);
     });
 
     let selectedPhotoFile = null;
@@ -1164,7 +1164,7 @@ export const initHome = ({
         try {
           avatarDataUrl = await compressImage(avatarDataUrl, { maxWidth: 256, maxHeight: 256, quality: 0.7 });
         } catch (compressErr) {
-          console.warn("No se pudo comprimir la imagen, se usará la original:", compressErr);
+          console.warn("No se pudo comprimir la imagen, se usar\u00e1 la original:", compressErr);
         }
 
         const newPlayer = {
@@ -1182,7 +1182,7 @@ export const initHome = ({
         renderPlayers();
       } catch (error) {
         console.error("No se pudo crear el jugador:", error);
-        statusLabel.textContent = "No se pudo crear el jugador. Inténtalo de nuevo.";
+        statusLabel.textContent = "No se pudo crear el jugador. Int\u00e9ntalo de nuevo.";
         statusLabel.classList.add("is-error");
       } finally {
         submitButton.disabled = false;
@@ -1215,7 +1215,7 @@ export const initHome = ({
       const potAmount = state.pot || 0;
       if (potAmount <= 0) {
         // En lugar de alert, vamos a dejar que se active pero daremos un aviso visual o log
-        console.log("El bote está vacío.");
+        console.log("El bote est\u00e1 vac\u00edo.");
         return;
       }
 
