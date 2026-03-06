@@ -152,7 +152,7 @@ export const initJimbo = ({
     if (!player) return;
 
     if (result === "win") {
-      appendLog(`¡${player.name} gana la batalla!`);
+      appendLog(`\u00a1${player.name} gana la batalla!`);
       const reward = 80 + player.pet.level * 40;
       player.money += reward;
       const xpGain = 0.75;
@@ -168,7 +168,6 @@ export const initJimbo = ({
       }
       saveState();
       setTimeout(() => {
-        showToast(`${player.name} gana ${reward.toLocaleString("es-ES")} monedas en Jimbo.`);
         showScreen("inicio");
         homeActions.render();
         homeActions.showMoneyAnimation(player.id, reward);
@@ -180,7 +179,6 @@ export const initJimbo = ({
       player.money -= penalty;
       addToPot(penalty);
       setTimeout(() => {
-        showToast(`${player.name} pierde ${penalty.toLocaleString("es-ES")} monedas en Jimbo.`);
         showScreen("inicio");
         homeActions.render();
         homeActions.showMoneyAnimation(player.id, -penalty);

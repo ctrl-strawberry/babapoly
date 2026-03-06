@@ -70,7 +70,7 @@
                   </path>
                 </svg>
               </span>
-              <span>Añadir</span>
+              <span>AÃ±adir</span>
             </button>
             <button id="resetGameBtn" class="add-player-btn reset-btn" type="button">
               <span class="svg-wrapper">
@@ -98,7 +98,7 @@
                   </path>
                 </svg>
               </span>
-              <span>Añadir jugador</span>
+              <span>AÃ±adir jugador</span>
             </button>
             <button id="resetGameBtn" class="add-player-btn reset-btn" type="button">
               <span class="svg-wrapper">
@@ -115,46 +115,60 @@
         </div>
       </section>
 
-      <section id="screen-jimbo">
+            <section id="screen-jimbo">
         <div class="jimbo-title-container">
           <div class="jimbo-button">
-            PASEO JIMBO
-            <div class="hoverEffect">
+            JIMBO LINK
+            <div class="hoverEffect" aria-hidden="true">
               <div></div>
             </div>
           </div>
         </div>
         <div id="jimboSelect" class="selector-grid"></div>
         <div id="battleStage" class="battle-stage" hidden>
-          <div class="battle-scene">
-            <img src="assets/campo.gif" alt="Campo de batalla" loading="lazy">
-            <div class="battle-info battle-info-player">
-              <div class="battle-info-head">
-                <span id="playerPetLabel" class="battle-info-name"></span>
-                <div class="battle-info-level" id="playerLevelLabel"></div>
-              </div>
-              <div class="bar">
-                <div class="bar-fill" id="playerHealthFill"></div>
-                <span class="bar-value" id="playerHealthText"></span>
+          <div class="battle-console">
+            <div class="battle-console-top">
+              <span class="battle-console-brand">BABA PET-01</span>
+              <span class="battle-console-copy">COMBAT LINK</span>
+            </div>
+            <div class="battle-screen-shell">
+              <div class="battle-scene">
+                <img src="assets/campo.gif" alt="Campo de batalla" loading="lazy">
+                <div class="battle-info battle-info-player">
+                  <div class="battle-info-head">
+                    <span id="playerPetLabel" class="battle-info-name"></span>
+                    <div class="battle-info-level" id="playerLevelLabel"></div>
+                  </div>
+                  <div class="bar">
+                    <div class="bar-fill" id="playerHealthFill"></div>
+                    <span class="bar-value" id="playerHealthText"></span>
+                  </div>
+                </div>
+                <div class="battle-info battle-info-enemy">
+                  <div class="battle-info-head">
+                    <span id="enemyLabel" class="battle-info-name"></span>
+                    <div class="battle-info-level" id="enemyLevelLabel"></div>
+                  </div>
+                  <div class="bar">
+                    <div class="bar-fill enemy" id="enemyHealthFill"></div>
+                    <span class="bar-value" id="enemyHealthText"></span>
+                  </div>
+                </div>
+                <img src="assets/jimbo.png" alt="Jimbo" class="battle-character battle-character-player" loading="lazy">
+                <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="Enemigo"
+                  class="battle-character battle-character-enemy" loading="lazy">
               </div>
             </div>
-            <div class="battle-info battle-info-enemy">
-              <div class="battle-info-head">
-                <span id="enemyLabel" class="battle-info-name"></span>
-                <div class="battle-info-level" id="enemyLevelLabel"></div>
+            <div class="battle-panel">
+              <div class="battle-panel-header">
+                <span id="battleTypeChip" class="battle-chip"></span>
+                <span id="battleThreatChip" class="battle-chip"></span>
+                <span id="battleIntentChip" class="battle-chip"></span>
               </div>
-              <div class="bar">
-                <div class="bar-fill enemy" id="enemyHealthFill"></div>
-                <span class="bar-value" id="enemyHealthText"></span>
-              </div>
+              <p id="battleHintText" class="battle-radar" aria-live="polite"></p>
+              <div id="attackGrid" class="attack-grid"></div>
+              <ul id="battleLog" class="battle-log" aria-live="polite"></ul>
             </div>
-            <!-- Characters with dynamic sources -->
-            <img src="assets/jimbo.png" alt="Jimbo" class="battle-character battle-character-player" loading="lazy">
-            <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="Enemigo"
-              class="battle-character battle-character-enemy" loading="lazy">
-          </div>
-          <div class="battle-panel">
-            <div id="attackGrid" class="attack-grid"></div>
           </div>
         </div>
       </section>
@@ -163,14 +177,14 @@
         <div class="image-lab">
           <div class="image-lab-top">
             <button class="btn btn-ghost" type="button" id="imageLabBackBtn" aria-label="Volver a Inicio">
-              ← Volver a Inicio
+              â† Volver a Inicio
             </button>
             <span class="image-lab-status" id="imageLabStatus"></span>
           </div>
-          <h2 id="imageLabTitle" class="section-title">Laboratorio de imágenes</h2>
+          <h2 id="imageLabTitle" class="section-title">Laboratorio de imÃ¡genes</h2>
           <p class="helper-text image-lab-description">
-            Prueba llamadas a tu backend y a la API de Google para depurar la generación de avatares. Esta herramienta
-            sólo se sirve en local; no expongas la clave públicamente.
+            Prueba llamadas a tu backend y a la API de Google para depurar la generaciÃ³n de avatares. Esta herramienta
+            sÃ³lo se sirve en local; no expongas la clave pÃºblicamente.
           </p>
           <div class="image-lab-grid">
             <form id="imageLabForm" class="image-lab-panel" autocomplete="off">
@@ -226,7 +240,7 @@
                   <summary>Prueba directa con la API de Google (uso local)</summary>
                   <label for="imageLabApiKey" class="image-lab-label">Clave de Google</label>
                   <input type="password" id="imageLabApiKey" autocomplete="off" placeholder="AIza...">
-                  <span class="helper-text">La clave sólo se usa desde tu navegador. No la compartas.</span>
+                  <span class="helper-text">La clave sÃ³lo se usa desde tu navegador. No la compartas.</span>
                   <button class="btn btn-ghost" type="button" id="imageLabDirectBtn">Llamar a Google
                     directamente</button>
                 </details>
@@ -238,7 +252,7 @@
               <div class="image-lab-preview-grid">
                 <figure class="image-lab-preview">
                   <img id="imageLabResultPreview" alt="Resultado de la llamada" loading="lazy">
-                  <figcaption id="imageLabResultInfo" class="helper-text">Aún no hay resultados.</figcaption>
+                  <figcaption id="imageLabResultInfo" class="helper-text">AÃºn no hay resultados.</figcaption>
                 </figure>
               </div>
 
@@ -264,7 +278,7 @@
         <!-- Game State -->
         <div id="rouletteGame" class="roulette-game" hidden>
           <div class="roulette-history-controls">
-            <div class="total-bet-display">Apuesta: <span id="rouletteTotalBet">0</span>€</div>
+            <div class="total-bet-display">Apuesta: <span id="rouletteTotalBet">0</span>â‚¬</div>
             <div class="history-btns-group">
               <button id="undoBtn" class="btn-history" title="Deshacer (Ctrl+Z)" aria-label="Deshacer">
                 <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
@@ -279,7 +293,7 @@
                 </svg>
               </button>
             </div>
-            <button id="repeatBetsBtn" class="btn-history btn-repeat" title="Repetir última apuesta"
+            <button id="repeatBetsBtn" class="btn-history btn-repeat" title="Repetir Ãºltima apuesta"
               aria-label="Repetir apuesta">
               <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
                 <path
@@ -353,7 +367,7 @@
         <div class="player-card-visual">
           <div class="player-avatar-blur" aria-hidden="true"></div>
           <div class="player-avatar-shade" aria-hidden="true"></div>
-          <img class="player-avatar" alt="">
+                    <img class="player-avatar" alt="">
         </div>
       </div>
       <span class="player-delete-btn" role="button" data-action="delete" title="Eliminar jugador"
@@ -372,7 +386,7 @@
   <div id="modalContainer"></div>
   <div id="toastLayer" aria-live="polite"></div>
 
-  <nav class="bottom-nav" aria-label="Navegación principal">
+  <nav class="bottom-nav" aria-label="NavegaciÃ³n principal">
     <div class="tabs-container">
       <div class="bottom-tabs">
         <input class="tab-input" type="radio" name="bottom-nav" id="bottom-nav-inicio" data-screen="inicio" checked>
@@ -416,3 +430,4 @@
 </body>
 
 </html>
+

@@ -9,7 +9,7 @@
 - `index.html`: estructura principal, tres secciones (`inicio`, `jimbo`, `ruleta`), plantillas reutilizables y navegación inferior; carga `js/main.js` como módulo ES.
 - `js/main.js`: punto de entrada. Crea instancias de `home`, `jimbo` y `roulette`, sincroniza vistas, toasts y navegación (`showScreen`).
 - `js/home.js`: renderiza tarjetas de jugadores, modal de alta y de transferencias, modo ajustes (añadir/eliminar) y animaciones de dinero.
-- `js/jimbo.js`: minijuego de batallas por turnos; calcula daño, XP y recompensas/penalizaciones. Usa `homeActions` para refrescar la vista al volver a Inicio.
+- `js/jimbo.js`: minijuego tactico por turnos con tres ataques situacionales, intencion enemiga visible, tipos elementales, RNG controlado y progresion de XP/recompensas. Usa `homeActions` para refrescar la vista al volver a Inicio.
 - `js/roulette.js`: lógica de la ruleta; valida apuestas, ejecuta animación, aplica ganancias/pérdidas y vuelve a Inicio.
 - `js/state.js`: define `state`, helpers CRUD y persistencia (`saveState`, `addPlayer`, `updatePlayerMoney`, etc.). `STORAGE_KEY = baba-poly-state-v1`.
 - `js/utils.js`: utilidades compartidas (`formatMoney`, `randomBetween`).
@@ -30,7 +30,7 @@
 - Mantén la separación por módulos: `home` para gestión de jugadores, `state` como fuente de verdad, minijuegos encapsulados.
 - Evita manipular el DOM fuera de los módulos encargados; añade nuevos elementos mediante plantillas cuando sea posible.
 - Los mensajes al usuario pasan por `showToast`. Añade helpers similares si necesitas feedback consistente.
-- Los logs de batalla (`appendLog`) actualmente no renderizan historial; si implementas un visor, mantenlo dentro de `jimbo`.
+- El panel de Jimbo renderiza chips tacticos, historial corto y botones estilo Game Boy dentro del propio modulo; manten esa logica encapsulada en `jimbo`.
 
 ## Desarrollo y verificación
 - Ejecuta con cualquier servidor estático: `python -m http.server 5173` (o similar) desde la raíz y abre `http://localhost:5173/index.html`.

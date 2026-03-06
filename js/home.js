@@ -554,36 +554,56 @@ export const initHome = ({
     const modal = document.createElement("div");
     modal.className = "modal-backdrop";
     modal.innerHTML = `
-      <div class="modal add-player-modal" role="dialog" aria-modal="true">
-        <header class="add-player-header">
-          <h2>Gestionar jugadores</h2>
+      <div class="modal add-player-modal add-player-modal-sheet" role="dialog" aria-modal="true">
+        <header class="add-player-header add-player-header-sheet">
+          <div class="add-player-handle" aria-hidden="true"></div>
+          <div class="add-player-header-copy">
+            <p class="add-player-eyebrow">Jugadores</p>
+            <h2>Gestionar jugadores</h2>
+          </div>
         </header>
-        <div class="add-player-content">
-          <section class="created-players-section">
-            <h3>Jugadores creados</h3>
-            <div class="created-player-list" id="createdPlayerList"></div>
+        <div class="add-player-content add-player-content-sheet">
+          <section class="created-players-section created-players-section-sheet">
+            <div class="section-block-header">
+              <div>
+                <h3>Catálogo</h3>
+              </div>
+            </div>
+            <div class="created-player-list created-player-list-sheet" id="createdPlayerList"></div>
             <div class="created-player-action-bar" id="createdPlayerActionBar" hidden>
               <button class="btn btn-primary" type="button" data-action="addSelected">Añadir</button>
               <button class="btn btn-danger" type="button" data-action="removeSelected">Eliminar</button>
             </div>
           </section>
-          <form class="new-player-form">
-            <h3>Crear jugador</h3>
-            <label for="newPlayerName">Nombre</label>
-            <input id="newPlayerName" type="text" maxlength="20" placeholder="Nombre del jugador" required>
-            <label for="newPlayerMoney">Dinero inicial</label>
-            <div class="money-inputs">
-              <input id="newPlayerMoneyRange" type="range" min="100" max="2000" step="50" value="500">
-              <input id="newPlayerMoneyValue" type="number" min="100" max="2000" step="50" value="500">
+          <form class="new-player-form new-player-form-sheet">
+            <div class="section-block-header">
+              <div>
+                <h3>Nuevo jugador</h3>
+              </div>
             </div>
-            <div class="color-picker">
-              <span class="color-picker-label">Color del fondo</span>
+            <div class="form-group-sheet">
+              <label for="newPlayerName">Nombre</label>
+              <input id="newPlayerName" type="text" maxlength="20" placeholder="Ej. Rosi" required>
+            </div>
+            <div class="form-group-sheet">
+              <label for="newPlayerMoney">Dinero inicial</label>
+              <div class="money-inputs money-inputs-sheet">
+                <input id="newPlayerMoneyRange" type="range" min="100" max="2000" step="50" value="500">
+                <input id="newPlayerMoneyValue" type="number" min="100" max="2000" step="50" value="500">
+              </div>
+            </div>
+            <div class="color-picker color-picker-sheet">
+              <div class="section-inline-head">
+                <span class="color-picker-label">Color</span>
+              </div>
               <div class="color-picker-options" id="newPlayerColorOptions" role="radiogroup" aria-label="Colores predeterminados"></div>
             </div>
-            <div class="photo-picker">
-              <span class="photo-picker-label">Foto</span>
-              <div class="photo-picker-options">
-                <button class="photo-picker-option" type="button" data-source="camera">
+            <div class="photo-picker photo-picker-sheet">
+              <div class="section-inline-head">
+                <span class="photo-picker-label">Foto</span>
+              </div>
+              <div class="photo-picker-options photo-picker-options-sheet">
+                <button class="photo-picker-option photo-picker-option-sheet" type="button" data-source="camera">
                   <span class="photo-picker-icon" aria-hidden="true">
                     <svg viewBox="0 0 48 48" role="img" focusable="false">
                       <path
@@ -594,7 +614,7 @@ export const initHome = ({
                   </span>
                   <span class="photo-picker-name">Cámara</span>
                 </button>
-                <button class="photo-picker-option" type="button" data-source="gallery">
+                <button class="photo-picker-option photo-picker-option-sheet" type="button" data-source="gallery">
                   <span class="photo-picker-icon" aria-hidden="true">
                     <svg viewBox="0 0 48 48" role="img" focusable="false">
                       <path
@@ -608,17 +628,17 @@ export const initHome = ({
               </div>
               <input id="newPlayerPhotoCamera" type="file" accept="image/*" capture="environment" hidden>
               <input id="newPlayerPhotoGallery" type="file" accept="image/*" hidden>
-              <p class="helper-text photo-picker-status" data-selected-photo-text aria-live="polite">
+              <p class="photo-picker-status photo-picker-status-sheet" data-selected-photo-text aria-live="polite">
                 Sin imagen seleccionada.
               </p>
             </div>
-            <div class="modal-actions">
+            <div class="modal-actions modal-actions-sheet">
               <button class="btn btn-ghost" type="button" data-action="cancel">Cancelar</button>
-              <button class="btn btn-primary" type="submit" data-action="submit">Crear</button>
+              <button class="btn btn-primary" type="submit" data-action="submit">Crear jugador</button>
             </div>
           </form>
         </div>
-        <p class="add-player-status" aria-live="polite"></p>
+        <p class="add-player-status add-player-status-sheet" aria-live="polite"></p>
       </div>
     `;
 
@@ -899,7 +919,7 @@ export const initHome = ({
       if (!availablePlayers.length) {
         updateCreatedPlayerActionBar();
         const emptyMessage = document.createElement("p");
-        emptyMessage.className = "helper-text";
+        emptyMessage.className = "created-player-empty";
         emptyMessage.textContent = catalog.length
           ? "Todos los jugadores guardados ya están en la partida."
           : "Todavía no has guardado ningún jugador.";

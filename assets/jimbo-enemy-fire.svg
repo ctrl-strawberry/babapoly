@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-labelledby="title desc">
+  <title id="title">Braserin</title>
+  <desc id="desc">Enemigo tipo fuego con forma de llama.</desc>
+  <ellipse cx="48" cy="82" rx="20" ry="6" fill="#000000" fill-opacity="0.18"/>
+  <path d="M48 10L58 24L70 20L72 38L84 50L74 68L57 78H39L22 68L12 50L24 38L28 20L40 28Z" fill="#ff7a2f"/>
+  <path d="M48 22L54 34L63 32L61 45L69 54L59 66L48 69L37 66L27 54L35 45L35 33L42 37Z" fill="#ffd166"/>
+  <rect x="31" y="43" width="12" height="12" rx="2" fill="#2b1b10"/>
+  <rect x="53" y="43" width="12" height="12" rx="2" fill="#2b1b10"/>
+  <rect x="35" y="47" width="4" height="4" fill="#ffffff"/>
+  <rect x="57" y="47" width="4" height="4" fill="#ffffff"/>
+  <path d="M34 62C40 58 56 58 62 62" fill="none" stroke="#7f2f00" stroke-width="4" stroke-linecap="round"/>
+</svg>

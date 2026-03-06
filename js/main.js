@@ -37,6 +37,11 @@ const enemyHealthText = document.getElementById("enemyHealthText");
 const attackGrid = document.getElementById("attackGrid");
 const playerLevelLabel = document.getElementById("playerLevelLabel");
 const enemyLevelLabel = document.getElementById("enemyLevelLabel");
+const battleTypeChip = document.getElementById("battleTypeChip");
+const battleThreatChip = document.getElementById("battleThreatChip");
+const battleIntentChip = document.getElementById("battleIntentChip");
+const battleHintText = document.getElementById("battleHintText");
+const battleLog = document.getElementById("battleLog");
 const playerCharacterSprite = document.querySelector(".battle-character-player");
 const enemyCharacterSprite = document.querySelector(".battle-character-enemy");
 
@@ -136,6 +141,11 @@ jimboApi = initJimbo({
   enemyHealthText,
   playerLevelLabel,
   enemyLevelLabel,
+  battleTypeChip,
+  battleThreatChip,
+  battleIntentChip,
+  battleHintText,
+  battleLog,
   playerCharacter: playerCharacterSprite,
   enemyCharacter: enemyCharacterSprite,
   showToast,
@@ -251,7 +261,7 @@ document.addEventListener("keydown", (event) => {
   if (currentScreen === "jimbo" && jimboApi.abortBattle()) return;
 });
 
-// Escuchar actualizaciones de estado (por ejemplo, de otras pestañas)
+// Escuchar actualizaciones de estado (por ejemplo, de otras pestaÃ±as)
 window.addEventListener("baba-poly-state-updated", () => {
   home.render();
   jimboApi.renderPlayerSelector(state.players);
@@ -264,3 +274,6 @@ jimboApi.renderPlayerSelector(state.players);
 rouletteApi.renderPlayerSelector(state.players);
 
 export { };
+
+
+
