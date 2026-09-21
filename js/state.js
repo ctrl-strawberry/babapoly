@@ -1,10 +1,23 @@
 import { formatMoney } from "./utils.js";
+import { getLoadout } from "./jimbo-combat.js";
 
 export const STORAGE_KEY = "baba-poly-state-v1";
 export const DEFAULT_PLAYER_COLOR = "#ffd23f";
 export const STATE_VERSION = 2;
 
 export const getPetXpGoal = (level) => 8 + Math.max(0, level - 1) * 3;
+
+export const gainPetXp = (pet, amount) => {
+  const previousLevel = pet.level;
+  pet.xp += amount;
+  let levelBonus = 0;
+  while (pet.xp >= getPetXpGoal(pet.level)) {
+    pet.xp -= getPetXpGoal(pet.level);
+    pet.level += 1;
+    levelBonus += pet.level * 80;
+  }
+  return { previousLevel, levelBonus };
+};
 
 export const getPetProgressLabel = (pet = {}) => {
   const level = Math.max(1, Math.round(Number(pet?.level) || 1));
@@ -28,6 +41,7 @@ const clonePlayer = (player) => ({
   pet: {
     level: player?.pet?.level ?? 1,
     xp: player?.pet?.xp ?? 0,
+    moves: getLoadout(player?.pet?.level ?? 1, player?.pet?.moves),
   },
 });
 
@@ -65,7 +79,7 @@ const sanitizePlayerEntry = (player, { sourceVersion = STATE_VERSION } = {}) => 
     id,
     name,
     money,
-    pet: { level, xp },
+    pet: { level, xp, moves: getLoadout(level, player?.pet?.moves) },
     avatar: typeof player?.avatar === "string" ? player.avatar : null,
     colorHex: sanitizePlayerColor(player?.colorHex),
   };

@@ -1,7 +1,7 @@
 import { state, resetGame } from "./state.js";
-import { initHome } from "./home.js";
+import { initHome } from "./home.js?v=5";
 import { initJimbo } from "./jimbo.js";
-import { initRoulette } from "./roulette.js";
+import { initRoulette } from "./roulette.js?v=3";
 import { initImageLab } from "./image-lab.js";
 
 const screens = {
@@ -100,12 +100,13 @@ const buildPathForScreen = (screenId) => {
   return `/#/${screenId}`;
 };
 
-const showToast = (message) => {
+const showToast = (message, { tone = "info", duration = 3200 } = {}) => {
   const toast = document.createElement("div");
   toast.className = "result-toast";
+  toast.dataset.tone = tone;
   toast.textContent = message;
-  toastLayer.appendChild(toast);
-  setTimeout(() => toast.remove(), 3200);
+  toastLayer.replaceChildren(toast);
+  setTimeout(() => toast.remove(), duration);
 };
 
 let jimboApi = null;
@@ -192,6 +193,7 @@ let currentScreen = "inicio";
 
 const showScreen = (screenId, { skipHistory = false } = {}) => {
   if (!screens[screenId]) return;
+  if (currentScreen === "jimbo" && screenId !== "jimbo") jimboApi.abortBattle();
   currentScreen = screenId;
   document.body.dataset.activeScreen = screenId;
 

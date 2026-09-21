@@ -17,11 +17,6 @@ const BANK_PLAYER_NAME = "Banca";
 const POT_PLAYER_ID = "pot";
 const POT_PLAYER_NAME = "Bote";
 
-const prefersDarkScheme =
-  typeof window !== "undefined" && window.matchMedia
-    ? window.matchMedia("(prefers-color-scheme: dark)")
-    : null;
-
 const COLOR_PRESETS = [
   { label: "Amarillo Solar", value: DEFAULT_PLAYER_COLOR },
   { label: "Ne\u00f3n Violeta", value: "#7f5af0" },
@@ -84,7 +79,7 @@ const adjustColorForScheme = (hex, isDark) => {
 };
 
 const getSchemeAdjustedNameColor = (hex) =>
-  adjustColorForScheme(hex, prefersDarkScheme?.matches ?? false);
+  adjustColorForScheme(hex, true);
 
 const applyNameAccent = (element, color) => {
   if (!element) return;
@@ -170,7 +165,6 @@ export const initHome = ({
   let potDisplayValue = state.pot ?? 0;
   let potAnimationTimer = null;
   const POT_ANIMATION_DURATION = 3000;
-
   const clearPotAnimation = () => {
     if (potAnimationTimer) {
       clearInterval(potAnimationTimer);
@@ -566,13 +560,18 @@ export const initHome = ({
           <section class="created-players-section created-players-section-sheet">
             <div class="section-block-header">
               <div>
-                <h3>Cat\u00e1logo</h3>
+                <h3 class="catalog-desktop-heading">Cat\u00e1logo</h3>
               </div>
             </div>
+            <button class="catalog-toggle" type="button" aria-expanded="false" aria-controls="catalogContent">
+              <span>Cat\u00e1logo</span><span class="catalog-chevron" aria-hidden="true">⌄</span>
+            </button>
+            <div class="catalog-content" id="catalogContent">
             <div class="created-player-list created-player-list-sheet" id="createdPlayerList"></div>
             <div class="created-player-action-bar" id="createdPlayerActionBar" hidden>
               <button class="btn btn-primary" type="button" data-action="addSelected">A\u00f1adir</button>
               <button class="btn btn-danger" type="button" data-action="removeSelected">Eliminar</button>
+            </div>
             </div>
           </section>
           <form class="new-player-form new-player-form-sheet">
@@ -586,9 +585,9 @@ export const initHome = ({
               <input id="newPlayerName" type="text" maxlength="20" placeholder="Ej. Rosi" required>
             </div>
             <div class="form-group-sheet">
-              <label for="newPlayerMoney">Dinero inicial</label>
+              <label for="newPlayerMoneyValue">Dinero inicial</label>
               <div class="money-inputs money-inputs-sheet">
-                <input id="newPlayerMoneyRange" type="range" min="100" max="2000" step="50" value="500">
+                <input id="newPlayerMoneyRange" type="range" min="100" max="2000" step="50" value="500" aria-label="Ajustar dinero inicial">
                 <input id="newPlayerMoneyValue" type="number" min="100" max="2000" step="50" value="500">
               </div>
             </div>
@@ -642,6 +641,12 @@ export const initHome = ({
       </div>
     `;
 
+    const catalogToggle = modal.querySelector(".catalog-toggle");
+    catalogToggle.addEventListener("click", () => {
+      const expanded = catalogToggle.getAttribute("aria-expanded") !== "true";
+      catalogToggle.setAttribute("aria-expanded", String(expanded));
+      modal.querySelector(".created-players-section").classList.toggle("catalog-expanded", expanded);
+    });
     const form = modal.querySelector(".new-player-form");
     const nameInput = form.querySelector("#newPlayerName");
     const rangeInput = form.querySelector("#newPlayerMoneyRange");
@@ -1402,14 +1407,18 @@ export const initHome = ({
       playerList.appendChild(card);
     });
 
+    if (!state.players.length) {
+      const empty = document.createElement("div");
+      empty.className = "home-empty";
+      empty.innerHTML = '<p>La mesa está lista. Falta el primer jugador.</p><button class="btn btn-primary" type="button">Añadir jugador</button>';
+      empty.querySelector("button").addEventListener("click", () => {
+        if (!editingMode) toggleEditing();
+        openAddPlayerModal();
+      });
+      playerList.appendChild(empty);
+    }
     onPlayersUpdated([...state.players]);
   };
-
-  if (prefersDarkScheme) {
-    prefersDarkScheme.addEventListener("change", () => {
-      renderPlayers();
-    });
-  }
 
   const toggleEditing = () => {
     editingMode = !editingMode;

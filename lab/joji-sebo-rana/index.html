@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Joji Split Rank</title>
+  <meta name="theme-color" content="#160705">
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+  <link rel="shortcut icon" href="./favicon.svg">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="page-noise" aria-hidden="true"></div>
+
+  <main class="app-shell">
+    <section class="poster" aria-labelledby="appTitle">
+      <div class="poster__grain" aria-hidden="true"></div>
+      <div class="poster__halo poster__halo--left" aria-hidden="true"></div>
+      <div class="poster__halo poster__halo--right" aria-hidden="true"></div>
+      <div class="poster__word" aria-hidden="true">JOJI</div>
+
+      <div class="poster__head">
+        <p class="poster__eyebrow">Piss In The Wind / dual rank</p>
+        <button class="action-button action-button--ghost" id="resetButton" type="button">Restaurar</button>
+      </div>
+
+      <div class="poster__copy">
+        <h1 id="appTitle">Sebo + Rana</h1>
+        <p class="poster__lede">
+          Dos listas del mismo album, una sola pagina, y un orden que se arrastra como si fuese una maqueta viva.
+        </p>
+      </div>
+
+      <div class="poster__metrics" aria-live="polite">
+        <article class="metric-tape">
+          <span class="metric-tape__label">Top consenso</span>
+          <strong class="metric-tape__value" id="consensusLeader">-</strong>
+        </article>
+        <article class="metric-tape">
+          <span class="metric-tape__label">Mayor choque</span>
+          <strong class="metric-tape__value" id="biggestGapSong">-</strong>
+          <span class="metric-tape__meta" id="biggestGapValue">-</span>
+        </article>
+        <article class="metric-tape">
+          <span class="metric-tape__label">Mismo puesto</span>
+          <strong class="metric-tape__value" id="sharedCount">0 / 21</strong>
+        </article>
+      </div>
+
+      <div class="control-strip">
+        <div class="control-strip__status">
+          <strong id="storageHintTitle">Autoguardado local activo</strong>
+          <span id="storageHintText">La lista se conserva en este navegador y en esta URL.</span>
+        </div>
+        <div class="control-strip__actions">
+          <button class="action-button" id="exportButton" type="button">Guardar lista</button>
+          <button class="action-button" id="importButton" type="button">Cargar lista</button>
+          <button class="action-button action-button--ghost" id="toggleConsensusButton" type="button">Ver ranking global</button>
+          <input id="importInput" type="file" accept="application/json" hidden>
+        </div>
+      </div>
+    </section>
+
+    <section class="consensus-panel" aria-labelledby="consensusTitle">
+      <div class="consensus-panel__head">
+        <div>
+          <p class="section-kicker">Comparativa</p>
+          <h2 id="consensusTitle">Ranking consenso por posicion</h2>
+        </div>
+        <p class="consensus-panel__hint">Media entre Sebo y Rana, con la diferencia real entre ambos.</p>
+      </div>
+      <div class="consensus-list" id="consensusList" role="list"></div>
+    </section>
+
+    <section class="columns" aria-label="Rankings personales de canciones">
+      <article class="ranking-column ranking-column--sebo">
+        <header class="ranking-column__header">
+          <div class="ranking-column__title">
+            <span class="persona-badge persona-badge--sebo" aria-hidden="true">S</span>
+            <div>
+              <p class="section-kicker">Perfil</p>
+              <h2>Sebo</h2>
+            </div>
+          </div>
+          <div class="ranking-column__summary">
+            <span class="ranking-column__summary-label">Tema #1</span>
+            <strong id="topSebo">-</strong>
+          </div>
+        </header>
+        <p class="ranking-column__hint">La chapa lateral se puede agarrar por cualquier punto. La etiqueta marca cuantos puestos cambia frente a Rana.</p>
+        <div class="song-list" id="list-sebo" role="list"></div>
+      </article>
+
+      <article class="ranking-column ranking-column--rana">
+        <header class="ranking-column__header">
+          <div class="ranking-column__title">
+            <span class="persona-badge persona-badge--rana" aria-hidden="true">R</span>
+            <div>
+              <p class="section-kicker">Perfil</p>
+              <h2>Rana</h2>
+            </div>
+          </div>
+          <div class="ranking-column__summary">
+            <span class="ranking-column__summary-label">Tema #1</span>
+            <strong id="topRana">-</strong>
+          </div>
+        </header>
+        <p class="ranking-column__hint">El orden se guarda solo aqui y ademas puedes sacar un JSON para no perderlo aunque cambies de URL.</p>
+        <div class="song-list" id="list-rana" role="list"></div>
+      </article>
+    </section>
+  </main>
+
+  <template id="songCardTemplate">
+    <article class="song-card" role="listitem">
+      <div class="song-card__burn" aria-hidden="true"></div>
+      <div class="song-card__meta">
+        <span class="song-card__rank"></span>
+        <div class="song-card__copy">
+          <h3 class="song-card__title"></h3>
+          <p class="song-card__subtitle"></p>
+        </div>
+      </div>
+      <div class="song-card__delta"></div>
+      <div class="song-card__drag" role="button" tabindex="0" aria-label="Arrastrar cancion">
+        <span class="song-card__liquid" aria-hidden="true"></span>
+        <span class="song-card__drag-word" aria-hidden="true">move</span>
+        <span class="song-card__grip" aria-hidden="true">
+          <span></span>
+          <span></span>
+          <span></span>
+        </span>
+      </div>
+    </article>
+  </template>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

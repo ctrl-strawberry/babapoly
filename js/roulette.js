@@ -523,12 +523,9 @@ export const initRoulette = ({
 
     if (winnings > 0) {
       player.money += winnings;
-      updateMessage(`¡Sale el ${number}! Ganas ${formatMoney(winnings)}`);
-      showToast(`Ganaste ${formatMoney(winnings)}!`);
       homeActions.render();
       homeActions.showMoneyAnimation(currentPlayerId, winnings - totalBet); // Net gain
     } else {
-      updateMessage(`Sale el ${number}. Suerte la próxima.`);
       addToPot(totalBet);
       homeActions.render();
       homeActions.showMoneyAnimation(currentPlayerId, -totalBet);
@@ -538,6 +535,18 @@ export const initRoulette = ({
     updatePlayerDisplay();
     lastBets = JSON.parse(JSON.stringify(currentBets)); // Save before clearing
     clearBets();
+    const netResult = winnings - totalBet;
+    const outcome = netResult > 0
+      ? `Has ganado ${formatMoney(netResult)} netas.`
+      : netResult < 0
+        ? `Has perdido ${formatMoney(Math.abs(netResult))}.`
+        : "Has recuperado tu apuesta. Ni ganas ni pierdes.";
+    const message = `Sale el ${number}. ${outcome}`;
+    updateMessage(message);
+    showToast(message, {
+      tone: netResult > 0 ? "gain" : netResult < 0 ? "loss" : "neutral",
+      duration: 5500,
+    });
   };
 
   const checkWin = (betId, number, color) => {
@@ -642,5 +651,4 @@ export const initRoulette = ({
     renderPlayerSelector,
   };
 };
-
 

@@ -2,110 +2,60 @@
   position: fixed;
   left: 0;
   right: 0;
-  bottom: 24px;
+  bottom: max(20px, env(safe-area-inset-bottom));
   display: flex;
   justify-content: center;
+  padding: 0 16px;
   pointer-events: none;
   z-index: 70;
-  padding-inline: 1rem;
-  transition: opacity 0.25s ease, transform 0.25s ease;
+  transition: opacity 180ms, transform 180ms;
 }
-
-.bottom-nav .tabs-container {
-  pointer-events: auto;
-}
-
-.bottom-nav.is-hidden {
-  opacity: 0;
-  transform: translateY(16px);
-}
-
-.bottom-nav.is-hidden .tabs-container {
-  pointer-events: none;
-}
-
+.bottom-nav .tabs-container { pointer-events: auto; }
+.bottom-nav.is-hidden { opacity: 0; transform: translateY(16px); visibility: hidden; }
+.bottom-nav.is-hidden .tabs-container { pointer-events: none; }
 .bottom-tabs {
+  --tab-width: 58px;
   position: relative;
   display: flex;
-  gap: 0.4rem;
+  gap: 4px;
+  border: 1px solid #525c43;
+  border-radius: 999px;
   background: var(--nav-bg);
   box-shadow: var(--nav-shadow);
-  padding: 0.55rem 0.65rem;
-  border-radius: 999px;
+  padding: 6px;
 }
-
-.bottom-tabs input[type="radio"] {
-  display: none;
-}
-
+.bottom-tabs input[type="radio"] { position: absolute; width: 1px; height: 1px; opacity: 0; }
 .bottom-tabs .tab {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 58px;
+  width: var(--tab-width);
   height: 58px;
   border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
   color: var(--nav-tab);
   cursor: pointer;
-  transition: color 0.2s ease;
+  transition: color 180ms;
   position: relative;
   z-index: 2;
   -webkit-tap-highlight-color: transparent;
+  font: 600 10px/1 "Segoe UI", sans-serif;
 }
-
-.bottom-tabs .tab svg {
-  width: 24px;
-  height: 24px;
-}
-
-.bottom-tabs input[type="radio"]:checked + .tab {
-  color: var(--nav-tab-active);
-}
-
+.bottom-tabs .tab svg { width: 24px; height: 24px; }
+.bottom-tabs input:checked + .tab { color: var(--nav-tab-active); }
+.bottom-tabs input:focus-visible + .tab { outline: 2px solid var(--primary); outline-offset: 3px; }
 .bottom-tabs .glider {
   position: absolute;
-  top: 50%;
-  left: 0.65rem;
-  width: 58px;
+  top: 6px;
+  left: 6px;
+  width: var(--tab-width);
   height: 58px;
   background: var(--nav-glider);
   border-radius: 50%;
-  transition: transform 0.25s ease-out;
+  transition: transform 220ms cubic-bezier(.2,.75,.25,1);
   z-index: 1;
-  transform: translateY(-50%);
 }
-
-#bottom-nav-inicio:checked ~ .glider {
-  transform: translate(0, -50%);
-}
-
-#bottom-nav-jimbo:checked ~ .glider {
-  transform: translate(calc(100% + 0.4rem), -50%);
-}
-
-#bottom-nav-ruleta:checked ~ .glider {
-  transform: translate(calc(200% + 0.8rem), -50%);
-}
-
-@media (hover: none) and (pointer: coarse) {
-  .bottom-tabs .tab:focus,
-  .bottom-tabs .tab:focus-visible {
-    outline: none;
-  }
-}
-
-@media (max-width: 700px) {
-  .bottom-nav {
-    bottom: 16px;
-  }
-
-  .bottom-tabs {
-    transform: scale(0.9);
-  }
-}
-
-@media (max-width: 420px) {
-  .bottom-tabs {
-    transform: scale(0.8);
-  }
-}
+#bottom-nav-inicio:checked ~ .glider { transform: translateX(0); }
+#bottom-nav-jimbo:checked ~ .glider { transform: translateX(calc(100% + 4px)); }
+#bottom-nav-ruleta:checked ~ .glider { transform: translateX(calc(200% + 8px)); }

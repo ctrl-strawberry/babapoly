@@ -1,4 +1,4 @@
-﻿:root {
+:root {
   color-scheme: light dark;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   --bg: #f4f6fd;
@@ -4340,5 +4340,3 @@ textarea:focus {
     font-size: 0.72rem;
   }
 }
-
-
